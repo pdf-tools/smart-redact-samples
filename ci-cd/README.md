@@ -20,6 +20,7 @@ Both examples expect these secrets/variables configured in your CI platform:
 | `PII_SERVICE_LICENSE_KEY` | Smart Redact license key |
 | `ENCRYPTION_KEY` | AES-256-GCM encryption key |
 | `ORCHESTRATOR_JWT_SECRET` | JWT signing secret |
+| `POSTGRES_PASSWORD` | PostgreSQL password (generate per environment, e.g. `openssl rand -base64 32 \| tr -d '=+/' \| head -c 32`) |
 | `DEPLOY_HOST` | Target server hostname/IP (for Docker Compose) |
 | `DEPLOY_SSH_KEY` | SSH private key for deployment |
 | `KUBE_CONFIG` | Base64-encoded kubeconfig file content (for the GitHub Actions example) |

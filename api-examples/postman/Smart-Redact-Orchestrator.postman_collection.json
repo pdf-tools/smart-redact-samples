@@ -83,7 +83,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"newPassword\": \"MySecurePassword1!\"\n}"
+							"raw": "{\n    \"newPassword\": \"<choose-a-strong-password>\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/v1/auth/reset-password",
@@ -127,7 +127,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"currentPassword\": \"MySecurePassword1!\",\n    \"newPassword\": \"NewPassword1!\"\n}"
+							"raw": "{\n    \"currentPassword\": \"<choose-a-strong-password>\",\n    \"newPassword\": \"<choose-a-new-strong-password>\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/v1/auth/change-password",
@@ -308,7 +308,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"UserPassword1!\",\n    \"roles\": [\"User\"]\n}"
+							"raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"<choose-a-strong-password>\",\n    \"roles\": [\"User\"]\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/v1/users",
@@ -378,7 +378,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"newPassword\": \"ResetPassword1!\"\n}"
+							"raw": "{\n    \"newPassword\": \"<choose-a-strong-password>\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/v1/users/{{userId}}/reset-password",

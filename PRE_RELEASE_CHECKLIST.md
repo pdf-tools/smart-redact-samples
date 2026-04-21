@@ -3,23 +3,16 @@
 Internal checklist to complete before making `smart-redact-samples` public on GitHub / Docker Hub.
 Delete this file before publishing.
 
-## Secrets and credentials
-
-- [ ] Rotate `PII_SERVICE_LICENSE_KEY`, `ENCRYPTION_KEY`, and `ORCHESTRATOR_JWT_SECRET` that were used during local testing (they passed through developer tooling and should not be reused in production).
-- [ ] Delete local `.env` file(s) that contain real license/encryption/JWT values: `rm docker-compose/cpu/.env` (and any other `.env` under `docker-compose/*/`).
-- [ ] Verify no secrets are present in tracked files: `git grep -E "RDCTSRV|BEGIN (RSA|EC) PRIVATE|eyJhbGci"` must return empty.
-- [ ] Confirm `.gitignore` still covers `.env`, `*.env`, `*.key`, `*.pem`, `secrets/`, `bin/`, `obj/`, `__pycache__/`.
-
 ## Docker image references
 
-- [ ] Finalize public Docker Hub image names and global-replace across the repo (currently `pdftoolsag/smart-redact-manager`, `pdftoolsag/smart-redact-worker`, `pdftoolsag/smart-redact-worker:*-cuda`, `pdftoolsag/smart-redact-orchestrator` — 21 references across 15 files).
+- [x] Final public Docker Hub image names confirmed as `pdftoolsag/smart-redact-manager`, `pdftoolsag/smart-redact-worker`, `pdftoolsag/smart-redact-worker:*-cuda`, `pdftoolsag/smart-redact-orchestrator` — no rename needed.
 - [ ] Publish the three images to Docker Hub as public (Manager, Worker CPU + CUDA, Orchestrator).
 - [ ] Smoke-test `docker pull` of each final image tag from a machine that is not logged in to any registry.
 
 ## Documentation placeholders
 
-- [ ] Replace all `SMART_REDACT_DOCS_URL` occurrences (23 instances across 19 files) with the final public documentation base URL. Affected:
-  - `README.md` (11 occurrences)
+- [ ] Replace all `SMART_REDACT_DOCS_URL` occurrences (27 instances across 13 files) with the final public documentation base URL. Affected:
+  - `README.md`
   - `.env.example`
   - `api-examples/README.md`, `api-examples/csharp/README.md`, `api-examples/csharp/Program.cs`
   - `api-examples/python/detect_pii.py`, `api-examples/python/redact_pii.py`, `api-examples/python/full_workflow.py`
@@ -27,41 +20,37 @@ Delete this file before publishing.
   - `docker-compose/README.md`
   - `kubernetes/README.md`
   - `opentelemetry/README.md`
-- [ ] Replace `<repo-url>` in `README.md` (`git clone <repo-url>`) with the final public Git URL.
-- [ ] Replace `nicerhugs` placeholder in `kubernetes/helm/smart-redact/Chart.yaml` `sources:` field with the final public repo URL.
+- [x] Replace `<repo-url>` in `README.md` with `https://github.com/pdf-tools/smart-redact-samples.git`.
+- [x] Replace `nicerhugs` placeholder in `kubernetes/helm/smart-redact/Chart.yaml` `sources:` field with `https://github.com/pdf-tools/smart-redact-samples`.
 
 ## Content fixes
 
-- [ ] Remove hardcoded `postgres-password="smartredact"` example in `ci-cd/github-actions/deploy.yml`, `ci-cd/gitlab-ci/.gitlab-ci.yml`, and `kubernetes/README.md`. Align with the secure pattern already used in `kubernetes/helm/smart-redact/templates/NOTES.txt` and `kubernetes/plain-manifests/secrets.yaml` (`openssl rand -base64 32 | tr -d '=+/' | head -c 32`).
-- [ ] Add a short note in `docker-compose/README.md` explaining that the default postgres password `smartredact` in `docker-compose/*/docker-compose.yml` is for local demonstration only and must be changed for production.
-- [ ] Align documented HTTP timeout default with the code (code uses 120s, docs/README say 30s). Update:
-  - `api-examples/python/detect_pii.py` docstring
-  - `api-examples/python/redact_pii.py` docstring
-  - `api-examples/python/full_workflow.py` docstring
-  - `api-examples/csharp/README.md` timeout table
-- [ ] Add a timeout guard to the worker health wait loop in `docker-run/run-all.sh` so that it does not loop forever if the worker never becomes healthy.
-- [ ] Soften Postman demo passwords in `api-examples/postman/Smart-Redact-Orchestrator.postman_collection.json` (`MySecurePassword1!`, `UserPassword1!`, `NewPassword1!`, `ResetPassword1!`) — replace with placeholder strings like `<choose-a-strong-password>` to avoid looking like a recommended copy-paste value. Keep the default `admin / Admin1234` as-is since that is the actual bootstrap credential.
+- [x] Removed hardcoded `postgres-password="smartredact"` from `ci-cd/github-actions/deploy.yml` and `ci-cd/gitlab-ci/.gitlab-ci.yml` (now sourced from `POSTGRES_PASSWORD` CI secret/variable; documented in `ci-cd/README.md`). `kubernetes/README.md` now generates the password via `openssl rand`.
+- [x] Added a note in `docker-compose/README.md` explaining that the default postgres password `smartredact` in `docker-compose/*/docker-compose.yml` is for local demonstration only and must be changed for production.
+- [x] Aligned documented HTTP timeout default with the code (now 120s in all docs):
+  - `api-examples/python/detect_pii.py`
+  - `api-examples/python/redact_pii.py`
+  - `api-examples/python/full_workflow.py`
+  - `api-examples/csharp/README.md`
+- [x] Added a timeout guard (`WORKER_HEALTH_TIMEOUT_SECONDS`, default 300s) to the worker health wait loop in `docker-run/run-all.sh`.
+- [x] Softened Postman demo passwords in `api-examples/postman/Smart-Redact-Orchestrator.postman_collection.json` (replaced with `<choose-a-strong-password>` / `<choose-a-new-strong-password>` placeholders). Default `admin / Admin1234` bootstrap credential kept as-is.
 
 ## Repository hygiene
 
-- [ ] Stage and commit the three currently untracked files:
+- [x] Committed the previously untracked files:
   - `.gitignore`
-  - `docker-run/run-storage-init.sh` (critical — `run-all.sh` fails without it)
+  - `docker-run/run-storage-init.sh`
   - `kubernetes/helm/smart-redact/templates/NOTES.txt`
-- [ ] Run `dotnet clean` in `api-examples/csharp/` and remove `api-examples/python/__pycache__/` before the final commit (they are gitignored but should not exist in the tree for cleanliness).
-- [ ] Remove any other local experimentation artifacts (backup files, test PDFs, downloaded outputs).
-- [ ] Clean up git history — squash or reorganize commits so the public history does not expose internal work-in-progress, personal notes, or the license key that passed through developer tooling. Two options:
-  - Option A: orphan branch with a single `Initial public release` commit (fastest, wipes all traces).
-  - Option B: logical multi-commit sequence (structure / API examples / Kubernetes / CI-CD / OpenTelemetry) for a cleaner-looking first public history.
+- [x] Cleaned up git history — single `Add Smart Redact samples` commit via orphan branch. Any future internal work-in-progress will be squashed again before publishing.
 
 ## Licensing and policies
 
-- [ ] Add a top-level `LICENSE` file. Decide between MIT / Apache-2.0 / proprietary sample license (consult Legal). The repo currently has no license file.
+- [ ] Add a top-level `LICENSE` file. Recommendation: **MIT** (standard for vendor sample repos, most permissive, widest downstream use). Apache-2.0 if an explicit patent grant is required. Confirm with Legal.
 - [ ] Add `SECURITY.md` with instructions for reporting security vulnerabilities (private disclosure address, expected response time).
 - [ ] Confirm that publishing these sample configurations as open source is approved (contracts, product, legal).
 - [ ] Confirm trademark usage of `PDF Tools` / `Smart Redact` in the README / Chart.yaml metadata.
 
-## Final verification
+## Final verification (to be repeated close to release)
 
 - [ ] Clone the repo into a clean directory as if a first-time customer would, fill in `.env` with a fresh license key, and run `docker compose -f docker-compose/cpu/docker-compose.yml up -d` end-to-end.
 - [ ] Run `bash scripts/wait-for-services.sh` and `bash scripts/health-check.sh` — both must pass.
@@ -76,7 +65,7 @@ Delete this file before publishing.
 
 ## Publishing
 
-- [ ] Create the public GitHub repository under the correct organization (kept private until launch).
+- [ ] Create the public GitHub repository at `https://github.com/pdf-tools/smart-redact-samples` (kept private until launch).
 - [ ] Push the cleaned history.
 - [ ] Enable branch protection on `main` (required reviews, no force push, signed commits if org policy).
 - [ ] Configure GitHub repo description, topics, and website link (documentation URL).

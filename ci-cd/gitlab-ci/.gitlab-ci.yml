@@ -99,7 +99,7 @@ deploy-production-compose:
         --from-literal=license-key="${PII_SERVICE_LICENSE_KEY}" \
         --from-literal=encryption-key="${ENCRYPTION_KEY}" \
         --from-literal=jwt-secret="${ORCHESTRATOR_JWT_SECRET}" \
-        --from-literal=postgres-password="smartredact" \
+        --from-literal=postgres-password="${POSTGRES_PASSWORD}" \
         --dry-run=client -o yaml | kubectl apply -f -
 
     # Deploy with Helm

@@ -11,6 +11,6 @@ keywords:
   - smart-redact
 home: https://www.pdf-tools.com
 sources:
-  - https://github.com/nicerhugs/smart-redact-samples
+  - https://github.com/pdf-tools/smart-redact-samples
 maintainers:
   - name: PDF Tools AG

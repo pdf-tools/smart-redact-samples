@@ -28,7 +28,7 @@ kubectl create secret generic smart-redact-secrets \
   --from-literal=license-key="<your-license-key>" \
   --from-literal=encryption-key="$(openssl rand -base64 32)" \
   --from-literal=jwt-secret="$(openssl rand -base64 64 | tr -d '\n')" \
-  --from-literal=postgres-password="smartredact"
+  --from-literal=postgres-password="$(openssl rand -base64 32 | tr -d '=+/' | head -c 32)"
 
 # Install with Helm
 helm install smart-redact ./helm/smart-redact \

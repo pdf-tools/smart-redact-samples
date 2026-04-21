@@ -131,7 +131,7 @@ jobs:
             --from-literal=license-key="${{ secrets.PII_SERVICE_LICENSE_KEY }}" \
             --from-literal=encryption-key="${{ secrets.ENCRYPTION_KEY }}" \
             --from-literal=jwt-secret="${{ secrets.ORCHESTRATOR_JWT_SECRET }}" \
-            --from-literal=postgres-password="smartredact" \
+            --from-literal=postgres-password="${{ secrets.POSTGRES_PASSWORD }}" \
             --dry-run=client -o yaml | kubectl apply -f -
 
       - name: Deploy with Helm

@@ -29,7 +29,7 @@ If no output path is given, the redacted file is saved as `<input>_redacted.pdf`
 | Environment Variable | Default | Description |
 |----------------------|---------|-------------|
 | `MANAGER_URL` | `http://localhost:9982` | Smart Redact Manager base URL |
-| `SMART_REDACT_HTTP_TIMEOUT_SECONDS` | `30` | Timeout for upload, download, and polling HTTP calls |
+| `SMART_REDACT_HTTP_TIMEOUT_SECONDS` | `120` | Timeout for upload, download, and polling HTTP calls |
 | `SMART_REDACT_JOB_TIMEOUT_SECONDS` | `3600` | Timeout for synchronous detection/redaction requests |
 
 Example:

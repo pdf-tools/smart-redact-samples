@@ -12,7 +12,7 @@ Environment variables:
     MANAGER_URL                        - Smart Redact Manager base URL
                                          (default: http://localhost:9982)
     SMART_REDACT_HTTP_TIMEOUT_SECONDS  - Timeout for upload/download/poll requests
-                                         (default: 30)
+                                         (default: 120)
     SMART_REDACT_JOB_TIMEOUT_SECONDS   - Timeout for synchronous detection/redaction
                                          requests (default: 3600)
 

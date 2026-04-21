@@ -57,6 +57,8 @@ docker compose up -d
 | `ENCRYPTION_KEY` | `../../scripts/generate-encryption-key.sh` | AES-256-GCM file encryption key |
 | `ORCHESTRATOR_JWT_SECRET` | `openssl rand -base64 64 \| tr -d '\n'` | JWT signing secret (not needed for minimal) |
 
+> **Note:** The provided `docker-compose.yml` files hardcode the PostgreSQL password as `smartredact` for local demonstration only. For any non-local deployment, replace it with a strong, per-environment value (e.g. `openssl rand -base64 32 | tr -d '=+/' | head -c 32`) and inject it via your secret store rather than committing it.
+
 ## Verifying the Deployment
 
 ```bash

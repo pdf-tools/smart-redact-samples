@@ -68,7 +68,7 @@ The fastest way to get Smart Redact running:
 
 ```bash
 # 1. Clone this repository
-git clone <repo-url>
+git clone https://github.com/pdf-tools/smart-redact-samples.git
 cd smart-redact-samples
 
 # 2. Create your .env file
