@@ -1,0 +1,972 @@
+{
+	"info": {
+		"_postman_id": "b7e3a1d4-5f28-4c9a-8b6e-1d3f5a7c9e2b",
+		"name": "Smart Redact Manager API",
+		"description": "API collection for the Smart Redact Manager Service.\n\n## Usage\n\n1. **Upload a PDF** -- Use \"Upload PDF File\" (local) or \"Upload File from URL\" to upload a document. The `pdfFileId` and `pdfDekToken` are saved automatically.\n2. **Run SI Detection** -- Use one of the SI Detection requests (sync or async). The `jobId`, `fdfFileId`, and `fdfDekToken` are saved automatically.\n3. **Poll async results** -- If using async mode, call \"Get SI Detection Result\" until the job completes.\n4. **Download the FDF** -- Use \"Download FDF File\" to get the redaction annotations.\n5. **(Optional) Edit and re-upload the FDF** -- Modify the FDF and use \"Upload Modified FDF File\" to upload it back.\n6. **Run SI Redaction** -- Start a redaction job with the PDF and FDF. The `redactedPdfFileId` and `redactedPdfDekToken` are saved automatically.\n7. **Download the redacted PDF** -- Use \"Download Redacted PDF\" to get the final result.\n\nAll IDs and tokens are propagated automatically via test scripts -- just run the requests in order.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Files",
+			"item": [
+				{
+					"name": "Upload PDF File",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set(\"pdfFileId\", jsonData.fileId);",
+									"    pm.collectionVariables.set(\"pdfDekToken\", jsonData.dekToken);",
+									"    console.log(\"Saved pdfFileId: \" + jsonData.fileId);",
+									"    console.log(\"Saved pdfDekToken\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"value": "",
+									"type": "file"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/files/upload/fromLocal",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"files",
+								"upload",
+								"fromLocal"
+							]
+						},
+						"description": "Upload a PDF file from your local machine. The `fileId` and `dekToken` are automatically saved to collection variables for use in subsequent requests."
+					},
+					"response": []
+				},
+				{
+					"name": "Upload File from URL",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set(\"pdfFileId\", jsonData.fileId);",
+									"    pm.collectionVariables.set(\"pdfDekToken\", jsonData.dekToken);",
+									"    console.log(\"Saved pdfFileId: \" + jsonData.fileId);",
+									"    console.log(\"Saved pdfDekToken\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"fileUrl\": \"https://example.com/sample.pdf\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/files/upload/fromUrl",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"files",
+								"upload",
+								"fromUrl"
+							]
+						},
+						"description": "Upload a PDF file by providing a publicly accessible URL. The `fileId` and `dekToken` are automatically saved to collection variables."
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Files",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/v1/files",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"files"
+							]
+						},
+						"description": "Get information about all uploaded files."
+					},
+					"response": []
+				},
+				{
+					"name": "Get File Info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/v1/files/{{pdfFileId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"files",
+								"{{pdfFileId}}"
+							]
+						},
+						"description": "Get information about a specific file by its ID."
+					},
+					"response": []
+				},
+				{
+					"name": "Download PDF File",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"fileId\": \"{{pdfFileId}}\",\n    \"dekToken\": \"{{pdfDekToken}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/files/download",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"files",
+								"download"
+							]
+						},
+						"description": "Download the original PDF file. Requires the `dekToken` from the upload response."
+					},
+					"response": []
+				},
+				{
+					"name": "Download FDF File",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"fileId\": \"{{fdfFileId}}\",\n    \"dekToken\": \"{{fdfDekToken}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/files/download",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"files",
+								"download"
+							]
+						},
+						"description": "Download the FDF file containing redaction annotations (output of SI Detection). Requires the `dekToken` from the detection job response."
+					},
+					"response": []
+				},
+				{
+					"name": "Download Redacted PDF",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"fileId\": \"{{redactedPdfFileId}}\",\n    \"dekToken\": \"{{redactedPdfDekToken}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/files/download",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"files",
+								"download"
+							]
+						},
+						"description": "Download the redacted PDF file (output of SI Redaction). Requires the `dekToken` from the redaction job response."
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Modified FDF File",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set(\"fdfFileId\", jsonData.fileId);",
+									"    pm.collectionVariables.set(\"fdfDekToken\", jsonData.dekToken);",
+									"    console.log(\"Saved fdfFileId: \" + jsonData.fileId);",
+									"    console.log(\"Saved fdfDekToken\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"value": "",
+									"type": "file"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/files/upload/fromLocal",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"files",
+								"upload",
+								"fromLocal"
+							]
+						},
+						"description": "Upload a modified FDF file for use in SI Redaction. Use this after downloading and editing the FDF from SI Detection. The `fdfFileId` and `fdfDekToken` are automatically saved to collection variables."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete File",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/v1/files/{{pdfFileId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"files",
+								"{{pdfFileId}}"
+							]
+						},
+						"description": "Delete a file by its ID."
+					},
+					"response": []
+				}
+			],
+			"description": "File management endpoints for uploading, downloading, and deleting PDF and FDF files."
+		},
+		{
+			"name": "Jobs - SI Detection",
+			"item": [
+				{
+					"name": "Create SI Detection Job (Sync)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200 || pm.response.code === 202) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set(\"jobId\", jsonData.jobId);",
+									"    console.log(\"Saved jobId: \" + jsonData.jobId);",
+									"    ",
+									"    if (jsonData.outputFiles && jsonData.outputFiles.length > 0) {",
+									"        var fdfFile = jsonData.outputFiles.find(f => f.fileCode === 'fdf');",
+									"        if (fdfFile) {",
+									"            pm.collectionVariables.set(\"fdfFileId\", fdfFile.fileId);",
+									"            pm.collectionVariables.set(\"fdfDekToken\", fdfFile.dekToken);",
+									"            console.log(\"Saved fdfFileId: \" + fdfFile.fileId);",
+									"            console.log(\"Saved fdfDekToken\");",
+									"        }",
+									"    }",
+									"",
+									"    if (jsonData.result && jsonData.result.redactions) {",
+									"        pm.collectionVariables.set(\"redactions\", JSON.stringify(jsonData.result.redactions));",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pdfFileId\": \"{{pdfFileId}}\",\n    \"dekToken\": \"{{pdfDekToken}}\",\n    \"processingMode\": \"sync\",\n    \"detectionConfiguration\": {\n        \"scoreThreshold\": 0.5\n    }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/jobs/SIDetection",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"jobs",
+								"SIDetection"
+							]
+						},
+						"description": "Create a synchronous SI Detection job. Waits for the detection to complete before returning the result.\n\nThe `jobId`, `fdfFileId`, `fdfDekToken`, and `redactions` are automatically saved from the response."
+					},
+					"response": []
+				},
+				{
+					"name": "Create SI Detection Job (Async)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200 || pm.response.code === 202) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set(\"jobId\", jsonData.jobId);",
+									"    console.log(\"Saved jobId: \" + jsonData.jobId);",
+									"    ",
+									"    if (jsonData.outputFiles && jsonData.outputFiles.length > 0) {",
+									"        var fdfFile = jsonData.outputFiles.find(f => f.fileCode === 'fdf');",
+									"        if (fdfFile) {",
+									"            pm.collectionVariables.set(\"fdfFileId\", fdfFile.fileId);",
+									"            pm.collectionVariables.set(\"fdfDekToken\", fdfFile.dekToken);",
+									"            console.log(\"Saved fdfFileId: \" + fdfFile.fileId);",
+									"            console.log(\"Saved fdfDekToken\");",
+									"        }",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pdfFileId\": \"{{pdfFileId}}\",\n    \"dekToken\": \"{{pdfDekToken}}\",\n    \"processingMode\": \"async\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/jobs/SIDetection",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"jobs",
+								"SIDetection"
+							]
+						},
+						"description": "Create an asynchronous SI Detection job. Returns immediately with a `jobId`. Poll \"Get SI Detection Result\" to check for completion."
+					},
+					"response": []
+				},
+				{
+					"name": "Create SI Detection Job (with Config)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200 || pm.response.code === 202) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set(\"jobId\", jsonData.jobId);",
+									"    console.log(\"Saved jobId: \" + jsonData.jobId);",
+									"    ",
+									"    if (jsonData.outputFiles && jsonData.outputFiles.length > 0) {",
+									"        var fdfFile = jsonData.outputFiles.find(f => f.fileCode === 'fdf');",
+									"        if (fdfFile) {",
+									"            pm.collectionVariables.set(\"fdfFileId\", fdfFile.fileId);",
+									"            pm.collectionVariables.set(\"fdfDekToken\", fdfFile.dekToken);",
+									"            console.log(\"Saved fdfFileId: \" + fdfFile.fileId);",
+									"            console.log(\"Saved fdfDekToken\");",
+									"        }",
+									"    }",
+									"",
+									"    if (jsonData.result && jsonData.result.redactions) {",
+									"        pm.collectionVariables.set(\"redactions\", JSON.stringify(jsonData.result.redactions));",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pdfFileId\": \"{{pdfFileId}}\",\n    \"dekToken\": \"{{pdfDekToken}}\",\n    \"processingMode\": \"sync\",\n    \"detectionConfiguration\": {\n        \"scoreThreshold\": 0.5,\n        \"labels\": [\"EMAIL_ADDRESS\", \"PHONE_NUMBER\", \"CREDIT_CARD\", \"IBAN\"],\n        \"languages\": [\"en\", \"de\"],\n        \"debugSettings\": {\n            \"disableDeterministicDetection\": false,\n            \"disableSemanticDetection\": false,\n            \"enablePiiLogging\": false\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/jobs/SIDetection",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"jobs",
+								"SIDetection"
+							]
+						},
+						"description": "Create an SI Detection job with a custom detection configuration specifying which entity labels to detect and which languages to use."
+					},
+					"response": []
+				},
+				{
+					"name": "Create SI Detection Job (Full Config)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200 || pm.response.code === 202) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set(\"jobId\", jsonData.jobId);",
+									"    console.log(\"Saved jobId: \" + jsonData.jobId);",
+									"    ",
+									"    if (jsonData.outputFiles && jsonData.outputFiles.length > 0) {",
+									"        var fdfFile = jsonData.outputFiles.find(f => f.fileCode === 'fdf');",
+									"        if (fdfFile) {",
+									"            pm.collectionVariables.set(\"fdfFileId\", fdfFile.fileId);",
+									"            pm.collectionVariables.set(\"fdfDekToken\", fdfFile.dekToken);",
+									"            console.log(\"Saved fdfFileId: \" + fdfFile.fileId);",
+									"            console.log(\"Saved fdfDekToken\");",
+									"        }",
+									"    }",
+									"",
+									"    if (jsonData.result && jsonData.result.redactions) {",
+									"        pm.collectionVariables.set(\"redactions\", JSON.stringify(jsonData.result.redactions));",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pdfFileId\": \"{{pdfFileId}}\",\n    \"dekToken\": \"{{pdfDekToken}}\",\n    \"processingMode\": \"sync\",\n    \"detectionConfiguration\": {\n        \"scoreThreshold\": 0.5,\n        \"labels\": [\n            \"ALPHANUMERIC_CODE\",\n            \"BARCODE\",\n            \"BIC_SWIFT\",\n            \"CREDIT_CARD\",\n            \"CURRENCY_CODE\",\n            \"DATE\",\n            \"DATETIME\",\n            \"DECIMAL_NUMBER\",\n            \"DOMAIN_NAME\",\n            \"DURATION\",\n            \"EMAIL_ADDRESS\",\n            \"FILE_PATH\",\n            \"GPS_COORDINATE\",\n            \"HASHTAG\",\n            \"HTTP_COOKIE\",\n            \"IBAN\",\n            \"INTEGER_NUMBER\",\n            \"IP_ADDRESS\",\n            \"ISIN\",\n            \"KEYWORD\",\n            \"LEI\",\n            \"MAC_ADDRESS\",\n            \"MENTION\",\n            \"MONEY\",\n            \"NUMERIC_ID\",\n            \"ORGANISATION\",\n            \"PERCENTAGE\",\n            \"PERSON\",\n            \"PHONE_NUMBER\",\n            \"PHYSICAL_ADDRESS\",\n            \"SCIENTIFIC_NUMBER\",\n            \"SSN\",\n            \"TIME\",\n            \"UNIQUE_IDENTIFIER\",\n            \"URL\",\n            \"USERNAME\",\n            \"VAT_NUMBER\",\n            \"VIN\"],\n        \"languages\": [\"en\", \"de\"],\n        \"regexTimeout\": 1000,\n        \"patternRecognizers\": [\n            {\n                \"name\": \"UsSsnRecognizer\",\n                \"label\": \"SSN\",\n                \"patterns\": [\n                    {\n                        \"name\": \"UsSSN\",\n                        \"regex\": \"\\\\b\\\\d{3}-\\\\d{2}-\\\\d{4}\\\\b\",\n                        \"score\": 0.85,\n                        \"allowBacktracking\": false\n                    }\n                ],\n                \"contextWords\": [\"SSN\", \"Sozialversicherungsnummer\", \"Versicherungsnummer\", \"Identifikationsnummer\"]\n            }\n        ],\n        \"keywordRecognizers\": [\n            {\n                \"name\": \"MyCustomDenyKeywords\",\n                \"label\": \"KEYWORD\",\n                \"keywords\": [\"Deutsche Nationalbank\"],\n                \"partialMatch\": false\n            }\n        ],\n        \"keywordExclusions\": [\n            {\n                \"name\": \"MyCustomSafeKeywords\",\n                \"excludedKeywords\": [\"Finanzviertel\"],\n                \"partialMatch\": false\n            }\n        ],\n        \"semanticRecognizer\": {\n            \"name\": \"GlinerLarge\",\n            \"entityMapping\": {\n                \"name\": \"PERSON\",\n                \"first name\": \"PERSON\",\n                \"last name\": \"PERSON\",\n                \"company name\": \"ORGANISATION\",\n                \"organization name\": \"ORGANISATION\",\n                \"location address\": \"PHYSICAL_ADDRESS\",\n                \"user name\": \"USERNAME\"\n            }\n        },\n        \"sameSpanStrategy\": \"DeterministicWins\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/jobs/SIDetection",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"jobs",
+								"SIDetection"
+							]
+						},
+						"description": "Create an SI Detection job with all available configuration options including pattern recognizers, keyword recognizers, keyword exclusions, semantic recognizer, and same-span strategy."
+					},
+					"response": []
+				},
+				{
+					"name": "Create SI Detection (Deterministic Only)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200 || pm.response.code === 202) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set(\"jobId\", jsonData.jobId);",
+									"    console.log(\"Saved jobId: \" + jsonData.jobId);",
+									"    ",
+									"    if (jsonData.outputFiles && jsonData.outputFiles.length > 0) {",
+									"        var fdfFile = jsonData.outputFiles.find(f => f.fileCode === 'fdf');",
+									"        if (fdfFile) {",
+									"            pm.collectionVariables.set(\"fdfFileId\", fdfFile.fileId);",
+									"            pm.collectionVariables.set(\"fdfDekToken\", fdfFile.dekToken);",
+									"            console.log(\"Saved fdfFileId: \" + fdfFile.fileId);",
+									"            console.log(\"Saved fdfDekToken\");",
+									"        }",
+									"    }",
+									"",
+									"    if (jsonData.result && jsonData.result.redactions) {",
+									"        pm.collectionVariables.set(\"redactions\", JSON.stringify(jsonData.result.redactions));",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pdfFileId\": \"{{pdfFileId}}\",\n    \"dekToken\": \"{{pdfDekToken}}\",\n    \"processingMode\": \"sync\",\n    \"detectionConfiguration\": {\n        \"debugSettings\": {\n            \"disableSemanticDetection\": true\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/jobs/SIDetection",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"jobs",
+								"SIDetection"
+							]
+						},
+						"description": "Create an SI Detection job using only deterministic (pattern-based) detection. Faster but may miss context-dependent entities."
+					},
+					"response": []
+				},
+				{
+					"name": "Create SI Detection (Semantic Only)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200 || pm.response.code === 202) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set(\"jobId\", jsonData.jobId);",
+									"    console.log(\"Saved jobId: \" + jsonData.jobId);",
+									"    ",
+									"    if (jsonData.outputFiles && jsonData.outputFiles.length > 0) {",
+									"        var fdfFile = jsonData.outputFiles.find(f => f.fileCode === 'fdf');",
+									"        if (fdfFile) {",
+									"            pm.collectionVariables.set(\"fdfFileId\", fdfFile.fileId);",
+									"            pm.collectionVariables.set(\"fdfDekToken\", fdfFile.dekToken);",
+									"            console.log(\"Saved fdfFileId: \" + fdfFile.fileId);",
+									"            console.log(\"Saved fdfDekToken\");",
+									"        }",
+									"    }",
+									"",
+									"    if (jsonData.result && jsonData.result.redactions) {",
+									"        pm.collectionVariables.set(\"redactions\", JSON.stringify(jsonData.result.redactions));",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pdfFileId\": \"{{pdfFileId}}\",\n    \"dekToken\": \"{{pdfDekToken}}\",\n    \"processingMode\": \"sync\",\n    \"detectionConfiguration\": {\n        \"debugSettings\": {\n            \"disableDeterministicDetection\": true\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/jobs/SIDetection",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"jobs",
+								"SIDetection"
+							]
+						},
+						"description": "Create an SI Detection job using only semantic (ML-based) detection. More accurate for context-dependent entities like names and addresses."
+					},
+					"response": []
+				},
+				{
+					"name": "Get SI Detection Result",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    ",
+									"    if (jsonData.outputFiles && jsonData.outputFiles.length > 0) {",
+									"        var fdfFile = jsonData.outputFiles.find(f => f.fileCode === 'fdf');",
+									"        if (fdfFile) {",
+									"            pm.collectionVariables.set(\"fdfFileId\", fdfFile.fileId);",
+									"            pm.collectionVariables.set(\"fdfDekToken\", fdfFile.dekToken);",
+									"            console.log(\"Saved fdfFileId: \" + fdfFile.fileId);",
+									"            console.log(\"Saved fdfDekToken\");",
+									"        }",
+									"    }",
+									"",
+									"    if (jsonData.result && jsonData.result.redactions) {",
+									"        pm.collectionVariables.set(\"redactions\", JSON.stringify(jsonData.result.redactions));",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/v1/jobs/SIDetection/{{jobId}}/result",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"jobs",
+								"SIDetection",
+								"{{jobId}}",
+								"result"
+							]
+						},
+						"description": "Get the result of an SI Detection job. Use this to poll for async job results. The `fdfFileId`, `fdfDekToken`, and `redactions` are automatically saved when the job is complete."
+					},
+					"response": []
+				}
+			],
+			"description": "SI Detection job endpoints. Detection analyzes a PDF document and identifies sensitive information (PII), producing an FDF file with redaction annotations."
+		},
+		{
+			"name": "Jobs - SI Redaction",
+			"item": [
+				{
+					"name": "Create SI Redaction Job (Sync)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200 || pm.response.code === 202) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set(\"jobId\", jsonData.jobId);",
+									"    console.log(\"Saved jobId: \" + jsonData.jobId);",
+									"    ",
+									"    if (jsonData.outputFiles && jsonData.outputFiles.length > 0) {",
+									"        var pdfFile = jsonData.outputFiles.find(f => f.fileCode === 'pdf');",
+									"        if (pdfFile) {",
+									"            pm.collectionVariables.set(\"redactedPdfFileId\", pdfFile.fileId);",
+									"            pm.collectionVariables.set(\"redactedPdfDekToken\", pdfFile.dekToken);",
+									"            console.log(\"Saved redactedPdfFileId: \" + pdfFile.fileId);",
+									"            console.log(\"Saved redactedPdfDekToken\");",
+									"        }",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pdfFileId\": \"{{pdfFileId}}\",\n    \"fdfFileId\": \"{{fdfFileId}}\",\n    \"pdfDekToken\": \"{{pdfDekToken}}\",\n    \"fdfDekToken\": \"{{fdfDekToken}}\",\n    \"redactionInput\": {\n        \"redactions\": {{redactions}}\n    },\n    \"processingMode\": \"sync\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/jobs/SIRedaction",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"jobs",
+								"SIRedaction"
+							]
+						},
+						"description": "Create a synchronous SI Redaction job. Applies the redaction annotations from the FDF to the original PDF, producing a redacted PDF.\n\nRequires the FDF file and DEK tokens from previous steps. The `redactedPdfFileId` and `redactedPdfDekToken` are automatically saved."
+					},
+					"response": []
+				},
+				{
+					"name": "Create SI Redaction Job (Async)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200 || pm.response.code === 202) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set(\"jobId\", jsonData.jobId);",
+									"    console.log(\"Saved jobId: \" + jsonData.jobId);",
+									"    ",
+									"    if (jsonData.outputFiles && jsonData.outputFiles.length > 0) {",
+									"        var pdfFile = jsonData.outputFiles.find(f => f.fileCode === 'pdf');",
+									"        if (pdfFile) {",
+									"            pm.collectionVariables.set(\"redactedPdfFileId\", pdfFile.fileId);",
+									"            pm.collectionVariables.set(\"redactedPdfDekToken\", pdfFile.dekToken);",
+									"            console.log(\"Saved redactedPdfFileId: \" + pdfFile.fileId);",
+									"            console.log(\"Saved redactedPdfDekToken\");",
+									"        }",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pdfFileId\": \"{{pdfFileId}}\",\n    \"fdfFileId\": \"{{fdfFileId}}\",\n    \"pdfDekToken\": \"{{pdfDekToken}}\",\n    \"fdfDekToken\": \"{{fdfDekToken}}\",\n    \"redactionInput\": {\n        \"redactions\": {{redactions}}\n    },\n    \"processingMode\": \"async\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/jobs/SIRedaction",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"jobs",
+								"SIRedaction"
+							]
+						},
+						"description": "Create an asynchronous SI Redaction job. Returns immediately with a `jobId`. Poll \"Get SI Redaction Result\" to check for completion."
+					},
+					"response": []
+				},
+				{
+					"name": "Get SI Redaction Result",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    ",
+									"    if (jsonData.outputFiles && jsonData.outputFiles.length > 0) {",
+									"        var pdfFile = jsonData.outputFiles.find(f => f.fileCode === 'pdf');",
+									"        if (pdfFile) {",
+									"            pm.collectionVariables.set(\"redactedPdfFileId\", pdfFile.fileId);",
+									"            pm.collectionVariables.set(\"redactedPdfDekToken\", pdfFile.dekToken);",
+									"            console.log(\"Saved redactedPdfFileId: \" + pdfFile.fileId);",
+									"            console.log(\"Saved redactedPdfDekToken\");",
+									"        }",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/v1/jobs/SIRedaction/{{jobId}}/result",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"jobs",
+								"SIRedaction",
+								"{{jobId}}",
+								"result"
+							]
+						},
+						"description": "Get the result of an SI Redaction job. Use this to poll for async job results. The `redactedPdfFileId` and `redactedPdfDekToken` are automatically saved when the job is complete."
+					},
+					"response": []
+				}
+			],
+			"description": "SI Redaction job endpoints. Redaction applies the annotations from an FDF file to the original PDF, permanently removing the detected sensitive information."
+		},
+		{
+			"name": "Health Checks",
+			"item": [
+				{
+					"name": "Startup Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/healthz/startup",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"healthz",
+								"startup"
+							]
+						},
+						"description": "Check if the service has started."
+					},
+					"response": []
+				},
+				{
+					"name": "Ready Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/healthz/ready",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"healthz",
+								"ready"
+							]
+						},
+						"description": "Check if the service is ready to accept requests. Wait for this to return \"Healthy\" before sending jobs."
+					},
+					"response": []
+				},
+				{
+					"name": "Live Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/healthz/live",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"healthz",
+								"live"
+							]
+						},
+						"description": "Check if the service is alive."
+					},
+					"response": []
+				}
+			],
+			"description": "Health check endpoints for monitoring service status."
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:9982",
+			"type": "string"
+		},
+		{
+			"key": "pdfFileId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "pdfDekToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "fdfFileId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "fdfDekToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "redactedPdfFileId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "redactedPdfDekToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "jobId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "redactions",
+			"value": ""
+		}
+	]
+}

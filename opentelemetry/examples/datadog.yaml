@@ -1,0 +1,53 @@
+# =============================================================================
+# OpenTelemetry Collector - Datadog Exporter
+# =============================================================================
+# Merge these sections into your otel-collector-config.yaml to export
+# Smart Redact telemetry to Datadog.
+#
+# Prerequisites:
+#   - A Datadog account with an API key
+#   - The otel/opentelemetry-collector-contrib image (includes the Datadog exporter)
+#
+# Documentation:
+#   https://docs.datadoghq.com/opentelemetry/collector_exporter/
+# =============================================================================
+
+# Add this under the top-level "exporters:" section
+exporters:
+  datadog:
+    api:
+      # Your Datadog API key. Use an environment variable for security:
+      #   key: ${env:DD_API_KEY}
+      key: "YOUR_DATADOG_API_KEY"
+
+      # Your Datadog site. Common values:
+      #   datadoghq.com      (US1 - default)
+      #   us3.datadoghq.com  (US3)
+      #   us5.datadoghq.com  (US5)
+      #   datadoghq.eu       (EU1)
+      #   ap1.datadoghq.com  (AP1)
+      site: "datadoghq.com"
+
+# Add this under the top-level "connectors:" section.
+# The Datadog connector generates APM metrics from trace data, which Datadog
+# uses to power its APM dashboards and monitors.
+connectors:
+  datadog/connector:
+
+# Replace or merge with your existing "service.pipelines:" section
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [datadog, datadog/connector]
+    # The traces pipeline feeds into the datadog connector, which produces
+    # metrics that are then exported alongside your regular metrics.
+    metrics:
+      receivers: [otlp, datadog/connector]
+      processors: [batch]
+      exporters: [datadog]
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [datadog]

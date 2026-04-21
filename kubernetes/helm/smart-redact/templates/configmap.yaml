@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: smart-redact-config
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "smart-redact.labels" . | nindent 4 }}
+data:
+  # Shared
+  FILE_STORAGE_TYPE: "HostFileSystem"
+  FILE_STORAGE_PATH: "/app/storage_folder"
+  DEK_TTL_MINUTES: "1440"
+
+  # Manager config
+  MANAGER_DB_TYPE: "PostgreSql"
+  MANAGER_WORKER_URL: "http://smart-redact-worker:{{ .Values.worker.port }}/"
+
+  # Orchestrator config
+  {{- if .Values.orchestrator.enabled }}
+  ORCHESTRATOR_DB_TYPE: "PostgreSql"
+  ORCHESTRATOR_MANAGER_URL: "http://smart-redact-manager:{{ .Values.manager.port }}/"
+  ORCHESTRATOR_POLLING_INTERVAL: "3"
+  {{- end }}
+
+  # OpenTelemetry
+  {{- if .Values.opentelemetry.enabled }}
+  OTEL_EXPORTER_OTLP_ENDPOINT: {{ .Values.opentelemetry.endpoint | quote }}
+  OTEL_EXPORTER_OTLP_PROTOCOL: {{ .Values.opentelemetry.protocol | quote }}
+  {{- end }}

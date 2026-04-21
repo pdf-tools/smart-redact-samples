@@ -1,0 +1,117 @@
+# =============================================================================
+# OpenTelemetry Collector - Self-Hosted Grafana LGTM Stack
+# =============================================================================
+# A complete OpenTelemetry Collector configuration for exporting Smart Redact
+# telemetry to a self-hosted Grafana observability stack:
+#
+#   - Loki       for logs     (HTTP push API)
+#   - Tempo      for traces   (OTLP gRPC)
+#   - Prometheus for metrics  (remote write)
+#
+# This is a full, standalone config file. Replace otel-collector-config.yaml
+# with this file to use it directly:
+#
+#   cp examples/self-hosted-grafana.yaml otel-collector-config.yaml
+#
+# Prerequisites:
+#   - Loki, Tempo, and Prometheus running and accessible from the collector
+#   - Prometheus configured with remote_write receiver enabled
+#     (start with --web.enable-remote-write-receiver or
+#      --enable-feature=remote-write-receiver)
+#
+# Adjust the endpoint URLs below to match your infrastructure.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Receivers
+# -----------------------------------------------------------------------------
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+# -----------------------------------------------------------------------------
+# Processors
+# -----------------------------------------------------------------------------
+processors:
+  # Batch telemetry to reduce the number of outgoing requests
+  batch:
+    send_batch_size: 1024
+    send_batch_max_size: 2048
+    timeout: 5s
+
+  # Add resource attributes to help identify the source in Grafana dashboards.
+  # Adjust the "deployment.environment" value to match your setup.
+  resource:
+    attributes:
+      - key: deployment.environment
+        value: "production"
+        action: upsert
+
+# -----------------------------------------------------------------------------
+# Exporters
+# -----------------------------------------------------------------------------
+exporters:
+  # --- Traces -> Tempo ---
+  # Tempo accepts OTLP natively over gRPC.
+  otlp/tempo:
+    endpoint: "tempo:4317"
+    tls:
+      insecure: true               # Set to false and configure certs for production
+
+  # --- Logs -> Loki ---
+  # The Loki exporter pushes logs via Loki's HTTP API.
+  # It automatically maps OTel resource attributes to Loki labels.
+  loki:
+    endpoint: "http://loki:3100/loki/api/v1/push"
+    default_labels_enabled:
+      exporter: false
+      job: true
+
+  # --- Metrics -> Prometheus ---
+  # Uses Prometheus remote write to push metrics.
+  # Requires Prometheus to have the remote write receiver enabled.
+  prometheusremotewrite:
+    endpoint: "http://prometheus:9090/api/v1/write"
+    tls:
+      insecure: true               # Set to false and configure certs for production
+    resource_to_telemetry_conversion:
+      enabled: true                # Promotes OTel resource attributes to metric labels
+
+  # Debug exporter for troubleshooting (optional, can be removed in production)
+  debug:
+    verbosity: basic
+
+# -----------------------------------------------------------------------------
+# Service
+# -----------------------------------------------------------------------------
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [resource, batch]
+      exporters: [otlp/tempo, debug]
+
+    metrics:
+      receivers: [otlp]
+      processors: [resource, batch]
+      exporters: [prometheusremotewrite, debug]
+
+    logs:
+      receivers: [otlp]
+      processors: [resource, batch]
+      exporters: [loki, debug]
+
+  telemetry:
+    logs:
+      level: info
+    metrics:
+      readers:
+        - pull:
+            exporter:
+              prometheus:
+                host: 0.0.0.0
+                port: 8888

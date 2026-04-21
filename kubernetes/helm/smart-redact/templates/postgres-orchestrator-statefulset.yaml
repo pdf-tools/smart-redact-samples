@@ -1,0 +1,68 @@
+{{- if and .Values.postgresOrchestrator.enabled .Values.orchestrator.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: smart-redact-orchestrator-db
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "smart-redact.labels" . | nindent 4 }}
+    app.kubernetes.io/component: orchestrator-db
+spec:
+  serviceName: smart-redact-orchestrator-db
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "smart-redact.selectorLabels" (dict "component" "orchestrator-db" "Release" .Release) | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "smart-redact.selectorLabels" (dict "component" "orchestrator-db" "Release" .Release) | nindent 8 }}
+    spec:
+      containers:
+        - name: postgres
+          image: "{{ .Values.postgresOrchestrator.image.repository }}:{{ .Values.postgresOrchestrator.image.tag }}"
+          ports:
+            - containerPort: 5432
+              protocol: TCP
+          env:
+            - name: POSTGRES_USER
+              value: smartredact
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.global.secretName }}
+                  key: postgres-password
+            - name: POSTGRES_DB
+              value: smartredact
+            - name: TZ
+              value: UTC
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+          resources:
+            {{- toYaml .Values.postgresOrchestrator.resources | nindent 12 }}
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "smartredact"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 5
+          livenessProbe:
+            exec:
+              command: ["pg_isready", "-U", "smartredact"]
+            initialDelaySeconds: 15
+            periodSeconds: 10
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        {{- if .Values.postgresOrchestrator.storage.storageClass }}
+        storageClassName: {{ .Values.postgresOrchestrator.storage.storageClass | quote }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.postgresOrchestrator.storage.size }}
+{{- end }}

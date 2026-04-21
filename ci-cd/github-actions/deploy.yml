@@ -1,0 +1,152 @@
+# =============================================================================
+# Smart Redact - GitHub Actions Deployment
+# =============================================================================
+# Example workflow for deploying Smart Redact.
+# Includes two jobs: Docker Compose (VM/server) and Kubernetes.
+# Enable the job(s) relevant to your infrastructure.
+#
+# Required secrets:
+#   PII_SERVICE_LICENSE_KEY, ENCRYPTION_KEY, ORCHESTRATOR_JWT_SECRET,
+#   DEPLOY_HOST, DEPLOY_SSH_KEY (for Docker Compose)
+#   KUBE_CONFIG (for Kubernetes)
+# =============================================================================
+
+name: Deploy Smart Redact
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Image version tag to deploy"
+        required: true
+        default: "latest"
+      environment:
+        description: "Target environment"
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  VERSION: ${{ github.event.inputs.version }}
+
+jobs:
+  # ===========================================================================
+  # Option A: Deploy to Docker Compose (VM / bare metal)
+  # ===========================================================================
+  deploy-docker-compose:
+    name: Deploy (Docker Compose)
+    runs-on: ubuntu-latest
+    # Uncomment to enable:
+    # if: true
+    if: false
+    environment: ${{ github.event.inputs.environment }}
+
+    steps:
+      - name: Checkout samples repo
+        uses: actions/checkout@v4
+
+      - name: Create .env file
+        run: |
+          cat > docker-compose/cpu/.env <<EOF
+          PII_SERVICE_LICENSE_KEY=${{ secrets.PII_SERVICE_LICENSE_KEY }}
+          ENCRYPTION_KEY=${{ secrets.ENCRYPTION_KEY }}
+          ORCHESTRATOR_JWT_SECRET=${{ secrets.ORCHESTRATOR_JWT_SECRET }}
+          VERSION=${{ env.VERSION }}
+          EOF
+
+      - name: Copy files to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: deploy
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          source: "docker-compose/cpu/docker-compose.yml,docker-compose/cpu/.env"
+          target: "/opt/smart-redact"
+          strip_components: 2
+
+      - name: Deploy on server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: deploy
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            cd /opt/smart-redact
+            docker compose pull
+            docker compose up -d --remove-orphans
+
+            # Wait for services
+            echo "Waiting for services..."
+            for i in $(seq 1 60); do
+              if curl -sf http://localhost:9982/healthz/ready > /dev/null 2>&1; then
+                echo "Manager is ready."
+                break
+              fi
+              sleep 5
+            done
+
+      - name: Verify deployment
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: deploy
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            curl -sf http://localhost:9982/healthz/ready || exit 1
+            curl -sf http://localhost:9983/healthz/ready || exit 1
+            echo "Deployment verified."
+
+  # ===========================================================================
+  # Option B: Deploy to Kubernetes (Helm)
+  # ===========================================================================
+  deploy-kubernetes:
+    name: Deploy (Kubernetes)
+    runs-on: ubuntu-latest
+    # Uncomment to enable:
+    # if: true
+    if: false
+    environment: ${{ github.event.inputs.environment }}
+
+    steps:
+      - name: Checkout samples repo
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+
+      - name: Configure kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
+
+      - name: Create/update secrets
+        run: |
+          kubectl create secret generic smart-redact-secrets \
+            --namespace smart-redact \
+            --from-literal=license-key="${{ secrets.PII_SERVICE_LICENSE_KEY }}" \
+            --from-literal=encryption-key="${{ secrets.ENCRYPTION_KEY }}" \
+            --from-literal=jwt-secret="${{ secrets.ORCHESTRATOR_JWT_SECRET }}" \
+            --from-literal=postgres-password="smartredact" \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Deploy with Helm
+        run: |
+          helm upgrade --install smart-redact \
+            ./kubernetes/helm/smart-redact \
+            --namespace smart-redact \
+            --create-namespace \
+            --set global.imageTag=${{ env.VERSION }} \
+            --wait \
+            --timeout 10m
+
+      - name: Verify deployment
+        run: |
+          kubectl rollout status deployment/smart-redact-manager -n smart-redact --timeout=5m
+          kubectl rollout status deployment/smart-redact-worker -n smart-redact --timeout=5m
+          kubectl rollout status deployment/smart-redact-orchestrator -n smart-redact --timeout=5m
+          echo "Deployment verified."

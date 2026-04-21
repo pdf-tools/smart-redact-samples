@@ -1,0 +1,71 @@
+# =============================================================================
+# Docker Compose Overlay - OpenTelemetry Collector for Smart Redact
+# =============================================================================
+# This overlay adds an OpenTelemetry Collector to the Smart Redact stack and
+# configures all services to export telemetry to it.
+#
+# Usage:
+#   docker compose \
+#     -f ../docker-compose/cpu/docker-compose.yml \
+#     -f docker-compose.otel.yml \
+#     up -d
+#
+# For GPU deployments, replace the base file:
+#   docker compose \
+#     -f ../docker-compose/gpu/docker-compose.yml \
+#     -f docker-compose.otel.yml \
+#     up -d
+#
+# To customize the collector, edit otel-collector-config.yaml in this directory
+# or replace it with one of the backend-specific examples from ./examples/.
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # OpenTelemetry Collector
+  # ---------------------------------------------------------------------------
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.150.1
+    container_name: otel-collector
+    command: ["--config", "/etc/otelcol/config.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otelcol/config.yaml:ro
+    ports:
+      - "4317:4317"     # OTLP gRPC receiver
+      - "4318:4318"     # OTLP HTTP receiver
+      - "8888:8888"     # Collector internal metrics
+    networks:
+      - smart-redact-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:13133/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
+  # Override Smart Redact services to point telemetry at the collector
+  # ---------------------------------------------------------------------------
+  smart-redact-manager:
+    environment:
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
+      OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"
+    depends_on:
+      otel-collector:
+        condition: service_healthy
+
+  smart-redact-worker:
+    environment:
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
+      OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"
+    depends_on:
+      otel-collector:
+        condition: service_healthy
+
+  smart-redact-orchestrator:
+    environment:
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
+      OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"
+    depends_on:
+      otel-collector:
+        condition: service_healthy

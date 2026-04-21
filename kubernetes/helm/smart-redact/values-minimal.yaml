@@ -1,0 +1,11 @@
+# =============================================================================
+# Smart Redact - Minimal Override Values (no Orchestrator)
+# =============================================================================
+# Usage: helm install smart-redact ./smart-redact -f values-minimal.yaml
+# =============================================================================
+
+orchestrator:
+  enabled: false
+
+postgresOrchestrator:
+  enabled: false

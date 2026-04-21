@@ -1,0 +1,120 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smart-redact-manager
+  namespace: smart-redact
+  labels:
+    app.kubernetes.io/name: smart-redact
+    app.kubernetes.io/component: manager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: smart-redact
+      app.kubernetes.io/component: manager
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: smart-redact
+        app.kubernetes.io/component: manager
+    spec:
+      securityContext:
+        fsGroup: 1654
+        runAsNonRoot: true
+        runAsUser: 1654
+      containers:
+        - name: manager
+          image: pdftoolsag/smart-redact-manager:latest
+          ports:
+            - containerPort: 9982
+          env:
+            - name: ServiceCommunication__ConnectionString
+              valueFrom:
+                configMapKeyRef:
+                  name: smart-redact-config
+                  key: MANAGER_WORKER_URL
+            - name: Database__DatabaseType
+              valueFrom:
+                configMapKeyRef:
+                  name: smart-redact-config
+                  key: MANAGER_DB_TYPE
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: smart-redact-secrets
+                  key: postgres-password
+            - name: Database__ConnectionString
+              value: "User ID=smartredact;Password=$(POSTGRES_PASSWORD);Server=smart-redact-manager-db;Port=5432;Database=smartredact;Maximum Pool Size=50;Timeout=30;"
+            - name: FileStorage__FileStorageType
+              valueFrom:
+                configMapKeyRef:
+                  name: smart-redact-config
+                  key: FILE_STORAGE_TYPE
+            - name: FileStorage__FilesDirectoryPath
+              valueFrom:
+                configMapKeyRef:
+                  name: smart-redact-config
+                  key: FILE_STORAGE_PATH
+            - name: Encryption__EncryptionKey
+              valueFrom:
+                secretKeyRef:
+                  name: smart-redact-secrets
+                  key: encryption-key
+            - name: Encryption__DekTokenTtlMinutes
+              valueFrom:
+                configMapKeyRef:
+                  name: smart-redact-config
+                  key: DEK_TTL_MINUTES
+            - name: Licensing__LicenseKey
+              valueFrom:
+                secretKeyRef:
+                  name: smart-redact-secrets
+                  key: license-key
+          volumeMounts:
+            - name: storage
+              mountPath: /app/storage_folder
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          startupProbe:
+            httpGet:
+              path: /healthz/startup
+              port: 9982
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 30
+          readinessProbe:
+            httpGet:
+              path: /healthz/ready
+              port: 9982
+            periodSeconds: 10
+            timeoutSeconds: 15
+          livenessProbe:
+            httpGet:
+              path: /healthz/live
+              port: 9982
+            periodSeconds: 30
+            timeoutSeconds: 10
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: smart-redact-storage
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: smart-redact-manager
+  namespace: smart-redact
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9982
+      targetPort: 9982
+      name: http
+  selector:
+    app.kubernetes.io/name: smart-redact
+    app.kubernetes.io/component: manager

@@ -1,0 +1,118 @@
+{{- if .Values.manager.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smart-redact-manager
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "smart-redact.labels" . | nindent 4 }}
+    app.kubernetes.io/component: manager
+spec:
+  replicas: {{ .Values.manager.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "smart-redact.selectorLabels" (dict "component" "manager" "Release" .Release) | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "smart-redact.selectorLabels" (dict "component" "manager" "Release" .Release) | nindent 8 }}
+    spec:
+      securityContext:
+        fsGroup: 1654
+        runAsNonRoot: true
+        runAsUser: 1654
+      containers:
+        - name: manager
+          image: "{{ .Values.manager.image.repository }}:{{ .Values.manager.image.tag | default .Values.global.imageTag }}"
+          imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+          ports:
+            - containerPort: {{ .Values.manager.port }}
+              protocol: TCP
+          env:
+            - name: ServiceCommunication__ConnectionString
+              valueFrom:
+                configMapKeyRef:
+                  name: smart-redact-config
+                  key: MANAGER_WORKER_URL
+            - name: Database__DatabaseType
+              valueFrom:
+                configMapKeyRef:
+                  name: smart-redact-config
+                  key: MANAGER_DB_TYPE
+            - name: Database__ConnectionString
+              value: "User ID=smartredact;Password=$(POSTGRES_PASSWORD);Server=smart-redact-manager-db;Port=5432;Database=smartredact;Maximum Pool Size=50;Timeout=30;"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.global.secretName }}
+                  key: postgres-password
+            - name: FileStorage__FileStorageType
+              valueFrom:
+                configMapKeyRef:
+                  name: smart-redact-config
+                  key: FILE_STORAGE_TYPE
+            - name: FileStorage__FilesDirectoryPath
+              valueFrom:
+                configMapKeyRef:
+                  name: smart-redact-config
+                  key: FILE_STORAGE_PATH
+            - name: Encryption__EncryptionKey
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.global.secretName }}
+                  key: encryption-key
+            - name: Encryption__DekTokenTtlMinutes
+              valueFrom:
+                configMapKeyRef:
+                  name: smart-redact-config
+                  key: DEK_TTL_MINUTES
+            - name: Licensing__LicenseKey
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.global.secretName }}
+                  key: license-key
+            {{- if .Values.opentelemetry.enabled }}
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: smart-redact-config
+                  key: OTEL_EXPORTER_OTLP_ENDPOINT
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              valueFrom:
+                configMapKeyRef:
+                  name: smart-redact-config
+                  key: OTEL_EXPORTER_OTLP_PROTOCOL
+            {{- end }}
+            {{- range $key, $value := .Values.manager.extraEnv }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+          volumeMounts:
+            - name: storage
+              mountPath: /app/storage_folder
+          resources:
+            {{- toYaml .Values.manager.resources | nindent 12 }}
+          startupProbe:
+            httpGet:
+              path: /healthz/startup
+              port: {{ .Values.manager.port }}
+            initialDelaySeconds: {{ .Values.manager.healthcheck.initialDelaySeconds }}
+            periodSeconds: {{ .Values.manager.healthcheck.periodSeconds }}
+            failureThreshold: {{ .Values.manager.healthcheck.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.manager.healthcheck.path }}
+              port: {{ .Values.manager.port }}
+            periodSeconds: {{ .Values.manager.healthcheck.periodSeconds }}
+            timeoutSeconds: {{ .Values.manager.healthcheck.timeoutSeconds }}
+          livenessProbe:
+            httpGet:
+              path: /healthz/live
+              port: {{ .Values.manager.port }}
+            periodSeconds: 30
+            timeoutSeconds: 10
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: smart-redact-storage
+{{- end }}

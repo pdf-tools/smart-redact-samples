@@ -1,0 +1,100 @@
+{{- if .Values.orchestrator.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smart-redact-orchestrator
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "smart-redact.labels" . | nindent 4 }}
+    app.kubernetes.io/component: orchestrator
+spec:
+  replicas: {{ .Values.orchestrator.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "smart-redact.selectorLabels" (dict "component" "orchestrator" "Release" .Release) | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "smart-redact.selectorLabels" (dict "component" "orchestrator" "Release" .Release) | nindent 8 }}
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1654
+      containers:
+        - name: orchestrator
+          image: "{{ .Values.orchestrator.image.repository }}:{{ .Values.orchestrator.image.tag | default .Values.global.imageTag }}"
+          imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+          ports:
+            - containerPort: {{ .Values.orchestrator.port }}
+              protocol: TCP
+          env:
+            - name: ManagerApi__BaseUrl
+              valueFrom:
+                configMapKeyRef:
+                  name: smart-redact-config
+                  key: ORCHESTRATOR_MANAGER_URL
+            - name: ManagerApi__PollingIntervalSeconds
+              valueFrom:
+                configMapKeyRef:
+                  name: smart-redact-config
+                  key: ORCHESTRATOR_POLLING_INTERVAL
+            - name: Database__DatabaseType
+              valueFrom:
+                configMapKeyRef:
+                  name: smart-redact-config
+                  key: ORCHESTRATOR_DB_TYPE
+            - name: Database__ConnectionString
+              value: "User ID=smartredact;Password=$(POSTGRES_PASSWORD);Server=smart-redact-orchestrator-db;Port=5432;Database=smartredact;Maximum Pool Size=50;Timeout=30;"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.global.secretName }}
+                  key: postgres-password
+            - name: Jwt__SecretKey
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.global.secretName }}
+                  key: jwt-secret
+            - name: Licensing__LicenseKey
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.global.secretName }}
+                  key: license-key
+            {{- if .Values.opentelemetry.enabled }}
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: smart-redact-config
+                  key: OTEL_EXPORTER_OTLP_ENDPOINT
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              valueFrom:
+                configMapKeyRef:
+                  name: smart-redact-config
+                  key: OTEL_EXPORTER_OTLP_PROTOCOL
+            {{- end }}
+            {{- range $key, $value := .Values.orchestrator.extraEnv }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.orchestrator.resources | nindent 12 }}
+          startupProbe:
+            httpGet:
+              path: /healthz/startup
+              port: {{ .Values.orchestrator.port }}
+            initialDelaySeconds: {{ .Values.orchestrator.healthcheck.initialDelaySeconds }}
+            periodSeconds: {{ .Values.orchestrator.healthcheck.periodSeconds }}
+            failureThreshold: {{ .Values.orchestrator.healthcheck.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.orchestrator.healthcheck.path }}
+              port: {{ .Values.orchestrator.port }}
+            periodSeconds: {{ .Values.orchestrator.healthcheck.periodSeconds }}
+            timeoutSeconds: {{ .Values.orchestrator.healthcheck.timeoutSeconds }}
+          livenessProbe:
+            httpGet:
+              path: /healthz/live
+              port: {{ .Values.orchestrator.port }}
+            periodSeconds: 30
+            timeoutSeconds: 10
+{{- end }}

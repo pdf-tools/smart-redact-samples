@@ -1,0 +1,141 @@
+# =============================================================================
+# Smart Redact - GitLab CI/CD Deployment
+# =============================================================================
+# Example pipeline for deploying Smart Redact.
+# Includes two deployment targets: Docker Compose and Kubernetes.
+# Enable the job(s) relevant to your infrastructure.
+#
+# Required CI/CD variables:
+#   PII_SERVICE_LICENSE_KEY, ENCRYPTION_KEY, ORCHESTRATOR_JWT_SECRET,
+#   DEPLOY_HOST, DEPLOY_SSH_KEY (for Docker Compose)
+#   KUBE_CONFIG (for Kubernetes)
+# =============================================================================
+
+stages:
+  - deploy
+  - verify
+
+variables:
+  VERSION: "latest"
+
+# =============================================================================
+# Option A: Deploy to Docker Compose (VM / bare metal)
+# =============================================================================
+
+.deploy-docker-compose:
+  stage: deploy
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache openssh-client rsync curl
+    - mkdir -p ~/.ssh
+    - echo "$DEPLOY_SSH_KEY" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+  script:
+    # Create .env file
+    - |
+      cat > docker-compose/cpu/.env <<EOF
+      PII_SERVICE_LICENSE_KEY=${PII_SERVICE_LICENSE_KEY}
+      ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      ORCHESTRATOR_JWT_SECRET=${ORCHESTRATOR_JWT_SECRET}
+      VERSION=${VERSION}
+      EOF
+
+    # Copy files to server
+    - rsync -avz docker-compose/cpu/ deploy@${DEPLOY_HOST}:/opt/smart-redact/
+
+    # Deploy
+    - |
+      ssh deploy@${DEPLOY_HOST} << 'DEPLOY_SCRIPT'
+        cd /opt/smart-redact
+        docker compose pull
+        docker compose up -d --remove-orphans
+
+        echo "Waiting for services..."
+        for i in $(seq 1 60); do
+          if curl -sf http://localhost:9982/healthz/ready > /dev/null 2>&1; then
+            echo "Manager is ready."
+            break
+          fi
+          sleep 5
+        done
+      DEPLOY_SCRIPT
+  # Uncomment to enable:
+  # rules:
+  #   - when: manual
+
+deploy-staging-compose:
+  extends: .deploy-docker-compose
+  environment:
+    name: staging
+  rules:
+    - when: never  # Change to 'manual' to enable
+
+deploy-production-compose:
+  extends: .deploy-docker-compose
+  environment:
+    name: production
+  rules:
+    - when: never  # Change to 'manual' to enable
+
+# =============================================================================
+# Option B: Deploy to Kubernetes (Helm)
+# =============================================================================
+
+.deploy-kubernetes:
+  stage: deploy
+  image:
+    name: alpine/helm:3.14
+    entrypoint: [""]
+  before_script:
+    - apk add --no-cache curl
+    - mkdir -p $HOME/.kube
+    - echo "$KUBE_CONFIG" | base64 -d > $HOME/.kube/config
+  script:
+    # Create/update secrets
+    - |
+      kubectl create secret generic smart-redact-secrets \
+        --namespace smart-redact \
+        --from-literal=license-key="${PII_SERVICE_LICENSE_KEY}" \
+        --from-literal=encryption-key="${ENCRYPTION_KEY}" \
+        --from-literal=jwt-secret="${ORCHESTRATOR_JWT_SECRET}" \
+        --from-literal=postgres-password="smartredact" \
+        --dry-run=client -o yaml | kubectl apply -f -
+
+    # Deploy with Helm
+    - |
+      helm upgrade --install smart-redact \
+        ./kubernetes/helm/smart-redact \
+        --namespace smart-redact \
+        --create-namespace \
+        --set global.imageTag=${VERSION} \
+        --wait \
+        --timeout 10m
+
+deploy-staging-k8s:
+  extends: .deploy-kubernetes
+  environment:
+    name: staging
+  rules:
+    - when: never  # Change to 'manual' to enable
+
+deploy-production-k8s:
+  extends: .deploy-kubernetes
+  environment:
+    name: production
+  rules:
+    - when: never  # Change to 'manual' to enable
+
+# =============================================================================
+# Verification (runs after deployment)
+# =============================================================================
+
+verify-deployment:
+  stage: verify
+  image: curlimages/curl:latest
+  script:
+    - curl -sf http://${DEPLOY_HOST}:9982/healthz/ready || exit 1
+    - curl -sf http://${DEPLOY_HOST}:9983/healthz/ready || exit 1
+    - echo "Deployment verified."
+  rules:
+    - when: never  # Change to 'on_success' to enable

@@ -1,0 +1,191 @@
+# =============================================================================
+# Smart Redact - Helm Chart Default Values (CPU)
+# =============================================================================
+# Override with: helm install -f values-gpu.yaml or --set key=value
+# =============================================================================
+
+# -- Global settings
+global:
+  # -- Docker image tag for all Smart Redact services
+  imageTag: "latest"
+  # -- Image pull policy
+  imagePullPolicy: IfNotPresent
+  # -- Name of the Kubernetes Secret containing credentials
+  # Required keys: license-key, encryption-key, jwt-secret, postgres-password
+  secretName: smart-redact-secrets
+
+# -- Namespace. Create it manually or pass `--create-namespace` to helm install.
+# Set createNamespace to true to have the chart own the Namespace resource.
+namespace: smart-redact
+createNamespace: false
+
+# =============================================================================
+# Manager
+# =============================================================================
+manager:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: pdftoolsag/smart-redact-manager
+  port: 9982
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+  # -- Health check configuration
+  healthcheck:
+    path: /healthz/ready
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 15
+    failureThreshold: 30
+  # -- Additional environment variables
+  extraEnv: {}
+
+# =============================================================================
+# Worker
+# =============================================================================
+worker:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: pdftoolsag/smart-redact-worker
+    # -- Set to "latest-cuda" for GPU; overridden in values-gpu.yaml
+    tag: ""
+  port: 4885
+  # -- Use GPU (set to true and use values-gpu.yaml)
+  gpu:
+    enabled: false
+    # -- Number of GPUs per worker pod
+    count: 1
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: "2"
+      memory: 4Gi
+  healthcheck:
+    path: /healthz/ready
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    timeoutSeconds: 30
+    failureThreshold: 30
+  # -- Node selector for worker pods (e.g., for GPU nodes)
+  nodeSelector: {}
+  # -- Tolerations for worker pods
+  tolerations: []
+  # -- Additional environment variables
+  extraEnv: {}
+
+# =============================================================================
+# Orchestrator
+# =============================================================================
+orchestrator:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: pdftoolsag/smart-redact-orchestrator
+  port: 9983
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+  healthcheck:
+    path: /healthz/ready
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 15
+    failureThreshold: 30
+  # -- Additional environment variables
+  extraEnv: {}
+
+# =============================================================================
+# PostgreSQL - Manager database
+# =============================================================================
+postgresManager:
+  enabled: true
+  image:
+    repository: postgres
+    tag: "15-alpine"
+  storage:
+    size: 10Gi
+    storageClass: ""
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+# =============================================================================
+# PostgreSQL - Orchestrator database
+# =============================================================================
+postgresOrchestrator:
+  enabled: true
+  image:
+    repository: postgres
+    tag: "15-alpine"
+  storage:
+    size: 5Gi
+    storageClass: ""
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+# =============================================================================
+# Shared storage for uploaded files
+# =============================================================================
+storage:
+  size: 50Gi
+  storageClass: ""
+  accessMode: ReadWriteMany
+
+# =============================================================================
+# Ingress
+# =============================================================================
+ingress:
+  enabled: false
+  className: nginx
+  annotations: {}
+  # -- Manager API host
+  managerHost: smart-redact-api.example.com
+  # -- Orchestrator API host
+  orchestratorHost: smart-redact.example.com
+  tls:
+    enabled: false
+    secretName: smart-redact-tls
+
+# =============================================================================
+# Horizontal Pod Autoscaler
+# =============================================================================
+autoscaling:
+  manager:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+  worker:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 70
+
+# =============================================================================
+# OpenTelemetry (optional)
+# =============================================================================
+opentelemetry:
+  enabled: false
+  endpoint: ""
+  protocol: "grpc"

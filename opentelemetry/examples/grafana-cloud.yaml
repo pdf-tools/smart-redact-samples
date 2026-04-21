@@ -1,0 +1,49 @@
+# =============================================================================
+# OpenTelemetry Collector - Grafana Cloud Exporter
+# =============================================================================
+# Merge these sections into your otel-collector-config.yaml to export
+# Smart Redact telemetry to Grafana Cloud via OTLP HTTP.
+#
+# Prerequisites:
+#   - A Grafana Cloud account
+#   - An OTLP endpoint and API token from your Grafana Cloud stack
+#     (find these under: Grafana Cloud Portal > your stack > OpenTelemetry)
+#
+# Documentation:
+#   https://grafana.com/docs/grafana-cloud/send-data/otlp/send-data-otlp/
+# =============================================================================
+
+# Add this under the top-level "exporters:" section
+exporters:
+  otlphttp/grafana-cloud:
+    # Your Grafana Cloud OTLP endpoint. Replace <STACK> with your stack name
+    # and <REGION> with your region (e.g., prod-us-east-0).
+    endpoint: "https://otlp-gateway-<REGION>.grafana.net/otlp"
+
+    headers:
+      # Grafana Cloud authenticates via the Authorization header.
+      # The token is your Grafana Cloud API token (with MetricsPublisher,
+      # TracesPublisher, and LogsPublisher scopes).
+      #
+      # Use an environment variable for security:
+      #   "Authorization": "Basic ${env:GRAFANA_CLOUD_OTLP_TOKEN}"
+      #
+      # The token format is: base64(<instance_id>:<api_token>)
+      # Generate this with: echo -n "<instance_id>:<api_token>" | base64
+      "Authorization": "Basic YOUR_BASE64_ENCODED_INSTANCE_ID_AND_TOKEN"
+
+# Replace or merge with your existing "service.pipelines:" section
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlphttp/grafana-cloud]
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlphttp/grafana-cloud]
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlphttp/grafana-cloud]
