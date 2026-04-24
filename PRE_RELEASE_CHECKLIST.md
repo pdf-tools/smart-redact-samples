@@ -5,9 +5,10 @@ Delete this file before publishing.
 
 ## Docker image references
 
-- [x] Final public Docker Hub image names confirmed as `pdftoolsag/smart-redact-manager`, `pdftoolsag/smart-redact-worker`, `pdftoolsag/smart-redact-worker:*-cuda`, `pdftoolsag/smart-redact-orchestrator` — no rename needed.
-- [ ] Publish the three images to Docker Hub as public (Manager, Worker CPU + CUDA, Orchestrator).
+- [x] Final public Docker Hub image names confirmed as `pdftoolsag/smart-redact-manager`, `pdftoolsag/smart-redact-worker`, `pdftoolsag/smart-redact-worker:*-cuda`, `pdftoolsag/smart-redact-orchestrator`, `pdftoolsag/smart-redact-hitl-web` — no rename needed.
+- [ ] Publish the four images to Docker Hub as public (Manager, Worker CPU + CUDA, Orchestrator, HITL Web UI).
 - [ ] Smoke-test `docker pull` of each final image tag from a machine that is not logged in to any registry.
+- [ ] Add or intentionally skip the `latest` Docker tags. Samples currently default to `0.99.0` because the initial Docker Hub push does not include `latest`.
 
 ## Documentation placeholders
 

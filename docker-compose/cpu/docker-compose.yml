@@ -1,7 +1,7 @@
 # =============================================================================
 # Smart Redact - Full Stack (CPU)
 # =============================================================================
-# Starts all services: Manager, Worker (CPU), Orchestrator, and 2x PostgreSQL.
+# Starts all services: Manager, Worker (CPU), Orchestrator, HITL Web UI, and 2x PostgreSQL.
 #
 # Usage:
 #   cp .env.example .env    # fill in required values
@@ -10,6 +10,7 @@
 # Services:
 #   - Manager API:      http://localhost:9982  (Swagger: http://localhost:9982/swagger)
 #   - Orchestrator API: http://localhost:9983  (Swagger: http://localhost:9983/swagger)
+#   - HITL Web UI:      http://localhost:3000
 #   - Worker API:       internal only (port 4885)
 # =============================================================================
 
@@ -33,7 +34,7 @@ services:
   # Manager - Client-facing API for files and jobs
   # ---------------------------------------------------------------------------
   smart-redact-manager:
-    image: pdftoolsag/smart-redact-manager:${VERSION:-latest}
+    image: pdftoolsag/smart-redact-manager:${VERSION:-0.99.0}
     container_name: smart-redact-manager
     ports:
       - "9982:9982"
@@ -72,7 +73,7 @@ services:
   # Worker - PII detection and redaction engine (CPU)
   # ---------------------------------------------------------------------------
   smart-redact-worker:
-    image: pdftoolsag/smart-redact-worker:${VERSION:-latest}
+    image: pdftoolsag/smart-redact-worker:${VERSION:-0.99.0}
     container_name: smart-redact-worker
     expose:
       - "4885"
@@ -104,7 +105,7 @@ services:
   # Orchestrator - Web UI backend, user management, JWT auth
   # ---------------------------------------------------------------------------
   smart-redact-orchestrator:
-    image: pdftoolsag/smart-redact-orchestrator:${VERSION:-latest}
+    image: pdftoolsag/smart-redact-orchestrator:${VERSION:-0.99.0}
     container_name: smart-redact-orchestrator
     ports:
       - "9983:9983"
@@ -129,6 +130,25 @@ services:
       timeout: 15s
       start_period: 30s
       retries: 30
+
+  # ---------------------------------------------------------------------------
+  # HITL Web UI - Human-in-the-loop review interface
+  # ---------------------------------------------------------------------------
+  smart-redact-hitl-web:
+    image: pdftoolsag/smart-redact-hitl-web:${VERSION:-0.99.0}
+    container_name: smart-redact-hitl-web
+    ports:
+      - "${HITL_WEB_PORT:-3000}:8080"
+    environment:
+      ORCHESTRATOR_HOST: "smart-redact-orchestrator"
+      VITE_API_URL: "${HITL_ORCHESTRATOR_URL:-http://localhost:9983}"
+      VITE_MANAGER_API_URL: "${HITL_MANAGER_URL:-http://localhost:9982}"
+    networks:
+      - smart-redact-network
+    restart: unless-stopped
+    depends_on:
+      smart-redact-orchestrator:
+        condition: service_healthy
 
   # ---------------------------------------------------------------------------
   # PostgreSQL - Manager database

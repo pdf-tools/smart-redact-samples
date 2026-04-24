@@ -6,7 +6,7 @@ Smart Redact automatically detects and redacts personally identifiable informati
 
 ## Architecture
 
-Smart Redact consists of three services:
+Smart Redact consists of four services:
 
 ```
                           ┌─────────────────────┐
@@ -16,6 +16,12 @@ Smart Redact consists of three services:
                           │  JWT auth, Web UI    │
                           │  backend             │
                           └──────────┬───────────┘
+                                     │ HTTP
+                          ┌──────────▲───────────┐
+                          │      HITL Web UI      │
+                          │      (port 3000)      │
+                          │ Human review workflow │
+                          └──────────────────────┘
                                      │ HTTP
 ┌──────────┐    HTTP     ┌───────────▼───────────┐    HTTP     ┌────────────────────┐
 │  Client   ├───────────►│     Manager API       ├───────────►│    Worker API       │
@@ -37,6 +43,7 @@ Smart Redact consists of three services:
 | **Manager** | 9982 | Client-facing API for file uploads and detection/redaction jobs |
 | **Worker** | 4885 | Internal service that performs PII detection and redaction |
 | **Orchestrator** | 9983 | Web UI backend with user management and JWT authentication |
+| **HITL Web UI** | 3000 | Human-in-the-loop review interface for detection results and redaction jobs |
 
 > For detailed architecture documentation, see [Smart Redact Architecture](SMART_REDACT_DOCS_URL/architecture).
 
@@ -44,6 +51,7 @@ Smart Redact consists of three services:
 
 - [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) v2+
 - A valid Smart Redact license key ([get one here](SMART_REDACT_DOCS_URL/licensing))
+- Docker Hub access to the `pdftoolsag` images. If the images are private, run `docker login` before `docker compose up` or `docker run`.
 - For GPU acceleration: NVIDIA GPU with [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html)
 
 ## Windows Users
@@ -94,6 +102,11 @@ docker compose up -d
 Once running:
 - **Manager API (Swagger):** http://localhost:9982/swagger
 - **Orchestrator API (Swagger):** http://localhost:9983/swagger
+- **HITL Web UI:** http://localhost:3000
+
+Default HITL / Orchestrator login:
+- **Username:** `admin`
+- **Password:** `Admin1234`
 
 ## Repository Structure
 
@@ -151,7 +164,10 @@ All Smart Redact services are configured via environment variables:
 | `PII_SERVICE_LICENSE_KEY` | Yes | Smart Redact license key |
 | `ENCRYPTION_KEY` | Yes | 32-byte Base64-encoded AES-256-GCM key |
 | `ORCHESTRATOR_JWT_SECRET` | Yes* | JWT signing secret (min 32 chars). *Only for Orchestrator. |
-| `VERSION` | No | Docker image tag (default: `latest`) |
+| `VERSION` | No | Docker image tag (default: `0.99.0`) |
+| `HITL_WEB_PORT` | No | Host port for the HITL Web UI (default: `3000`) |
+| `HITL_ORCHESTRATOR_URL` | No | Browser-facing Orchestrator API URL used by the HITL Web UI (default: `http://localhost:9983`) |
+| `HITL_MANAGER_URL` | No | Browser-facing Manager API URL used by the HITL Web UI (default: `http://localhost:9982`) |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | No | OpenTelemetry collector endpoint |
 | `OTEL_EXPORTER_OTLP_PROTOCOL` | No | OpenTelemetry protocol (`grpc` or `http/protobuf`) |
 

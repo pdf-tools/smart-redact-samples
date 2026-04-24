@@ -19,7 +19,7 @@ on:
       version:
         description: "Image version tag to deploy"
         required: true
-        default: "latest"
+        default: "0.99.0"
       environment:
         description: "Target environment"
         required: true
