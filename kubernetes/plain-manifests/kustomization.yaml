@@ -22,6 +22,7 @@ resources:
   - worker.yaml
   - manager.yaml
   - orchestrator.yaml
+  - hitl-web.yaml
 
 labels:
   - includeSelectors: false
@@ -30,8 +31,10 @@ labels:
 
 images:
   - name: pdftoolsag/smart-redact-manager
-    newTag: latest
+    newTag: 0.99.0
   - name: pdftoolsag/smart-redact-worker
-    newTag: latest
+    newTag: 0.99.0
   - name: pdftoolsag/smart-redact-orchestrator
-    newTag: latest
+    newTag: 0.99.0
+  - name: pdftoolsag/smart-redact-hitl-web
+    newTag: 0.99.0

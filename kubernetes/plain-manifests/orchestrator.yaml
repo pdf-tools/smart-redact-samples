@@ -23,7 +23,7 @@ spec:
         runAsUser: 1654
       containers:
         - name: orchestrator
-          image: pdftoolsag/smart-redact-orchestrator:latest
+          image: pdftoolsag/smart-redact-orchestrator:0.99.0
           ports:
             - containerPort: 9983
           env:

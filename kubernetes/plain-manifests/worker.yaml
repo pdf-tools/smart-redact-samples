@@ -24,7 +24,7 @@ spec:
         runAsUser: 1654
       containers:
         - name: worker
-          image: pdftoolsag/smart-redact-worker:latest
+          image: pdftoolsag/smart-redact-worker:0.99.0
           ports:
             - containerPort: 4885
           env:

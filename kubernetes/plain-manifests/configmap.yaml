@@ -17,3 +17,7 @@ data:
   ORCHESTRATOR_DB_TYPE: "PostgreSql"
   ORCHESTRATOR_MANAGER_URL: "http://smart-redact-manager:9982/"
   ORCHESTRATOR_POLLING_INTERVAL: "3"
+
+  # HITL Web UI browser-facing URLs
+  HITL_WEB_ORCHESTRATOR_URL: "http://localhost:9983"
+  HITL_WEB_MANAGER_URL: "http://localhost:9982"

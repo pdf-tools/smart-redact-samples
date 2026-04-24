@@ -24,7 +24,7 @@ spec:
         runAsUser: 1654
       containers:
         - name: manager
-          image: pdftoolsag/smart-redact-manager:latest
+          image: pdftoolsag/smart-redact-manager:0.99.0
           ports:
             - containerPort: 9982
           env:
