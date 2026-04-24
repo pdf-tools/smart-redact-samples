@@ -21,5 +21,5 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 Image tag - uses component-specific tag if set, otherwise global
 */}}
 {{- define "smart-redact.imageTag" -}}
-{{- . | default $.Values.global.imageTag | default "latest" -}}
+{{- . | default $.Values.global.imageTag | default "0.99.0" -}}
 {{- end }}

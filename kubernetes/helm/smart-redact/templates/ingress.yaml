@@ -21,6 +21,9 @@ spec:
         {{- if .Values.orchestrator.enabled }}
         - {{ .Values.ingress.orchestratorHost }}
         {{- end }}
+        {{- if .Values.hitlWeb.enabled }}
+        - {{ .Values.ingress.hitlWebHost }}
+        {{- end }}
       secretName: {{ .Values.ingress.tls.secretName }}
   {{- end }}
   rules:
@@ -45,5 +48,17 @@ spec:
                 name: smart-redact-orchestrator
                 port:
                   number: {{ .Values.orchestrator.port }}
+    {{- end }}
+    {{- if .Values.hitlWeb.enabled }}
+    - host: {{ .Values.ingress.hitlWebHost }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: smart-redact-hitl-web
+                port:
+                  number: {{ .Values.hitlWeb.port }}
     {{- end }}
 {{- end }}

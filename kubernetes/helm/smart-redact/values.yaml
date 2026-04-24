@@ -7,7 +7,7 @@
 # -- Global settings
 global:
   # -- Docker image tag for all Smart Redact services
-  imageTag: "latest"
+  imageTag: "0.99.0"
   # -- Image pull policy
   imagePullPolicy: IfNotPresent
   # -- Name of the Kubernetes Secret containing credentials
@@ -53,7 +53,7 @@ worker:
   replicaCount: 1
   image:
     repository: pdftoolsag/smart-redact-worker
-    # -- Set to "latest-cuda" for GPU; overridden in values-gpu.yaml
+    # -- Set to "0.99.0-cuda" for GPU; overridden in values-gpu.yaml
     tag: ""
   port: 4885
   # -- Use GPU (set to true and use values-gpu.yaml)
@@ -103,6 +103,36 @@ orchestrator:
     periodSeconds: 10
     timeoutSeconds: 15
     failureThreshold: 30
+  # -- Additional environment variables
+  extraEnv: {}
+
+# =============================================================================
+# HITL Web UI
+# =============================================================================
+hitlWeb:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: pdftoolsag/smart-redact-hitl-web
+  port: 3000
+  containerPort: 8080
+  orchestratorHost: smart-redact-orchestrator
+  # -- Browser-facing API URLs used by the HITL Web UI
+  orchestratorApiUrl: "http://localhost:9983"
+  managerApiUrl: "http://localhost:9982"
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  healthcheck:
+    path: /
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 12
   # -- Additional environment variables
   extraEnv: {}
 
@@ -163,6 +193,8 @@ ingress:
   managerHost: smart-redact-api.example.com
   # -- Orchestrator API host
   orchestratorHost: smart-redact.example.com
+  # -- HITL Web UI host
+  hitlWebHost: smart-redact-hitl.example.com
   tls:
     enabled: false
     secretName: smart-redact-tls

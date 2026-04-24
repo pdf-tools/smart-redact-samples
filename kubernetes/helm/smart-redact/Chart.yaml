@@ -3,7 +3,7 @@ name: smart-redact
 description: A Helm chart for deploying Smart Redact - PII detection and redaction service by PDF Tools AG
 type: application
 version: 0.1.0
-appVersion: "latest"
+appVersion: "0.99.0"
 keywords:
   - pii
   - redaction

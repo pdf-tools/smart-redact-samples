@@ -1,0 +1,19 @@
+{{- if .Values.hitlWeb.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: smart-redact-hitl-web
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "smart-redact.labels" . | nindent 4 }}
+    app.kubernetes.io/component: hitl-web
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.hitlWeb.port }}
+      targetPort: {{ .Values.hitlWeb.containerPort }}
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "smart-redact.selectorLabels" (dict "component" "hitl-web" "Release" .Release) | nindent 4 }}
+{{- end }}

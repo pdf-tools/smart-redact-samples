@@ -23,6 +23,9 @@ Services exposed internally (ClusterIP):
 {{- if .Values.orchestrator.enabled }}
   - Orchestrator: http://smart-redact-orchestrator.{{ .Values.namespace }}.svc:{{ .Values.orchestrator.port }}
 {{- end }}
+{{- if .Values.hitlWeb.enabled }}
+  - HITL Web UI:  http://smart-redact-hitl-web.{{ .Values.namespace }}.svc:{{ .Values.hitlWeb.port }}
+{{- end }}
 
 Port-forward to access locally:
   kubectl port-forward -n {{ .Values.namespace }} svc/smart-redact-manager {{ .Values.manager.port }}:{{ .Values.manager.port }}
@@ -30,6 +33,9 @@ Port-forward to access locally:
   kubectl port-forward -n {{ .Values.namespace }} svc/smart-redact-orchestrator {{ .Values.orchestrator.port }}:{{ .Values.orchestrator.port }}
 
 Default Orchestrator login: admin / Admin1234 (password reset required on first login)
+{{- end }}
+{{- if .Values.hitlWeb.enabled }}
+  kubectl port-forward -n {{ .Values.namespace }} svc/smart-redact-hitl-web {{ .Values.hitlWeb.port }}:{{ .Values.hitlWeb.port }}
 {{- end }}
 
 Check rollout:
@@ -39,4 +45,7 @@ Check rollout:
 {{- end }}
 {{- if .Values.orchestrator.enabled }}
   kubectl rollout status -n {{ .Values.namespace }} deploy/smart-redact-orchestrator
+{{- end }}
+{{- if .Values.hitlWeb.enabled }}
+  kubectl rollout status -n {{ .Values.namespace }} deploy/smart-redact-hitl-web
 {{- end }}

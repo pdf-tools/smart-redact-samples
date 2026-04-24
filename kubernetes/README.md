@@ -16,6 +16,8 @@ Kubernetes deployment configurations for Smart Redact.
 The provided Kubernetes samples expect shared persistent storage for `/app/storage_folder`.
 Your cluster must provide a storage class that supports `ReadWriteMany` access mode, or you must adapt the manifests/chart to your storage model.
 
+If the Docker Hub images are private, configure image pull access for your cluster before applying these samples.
+
 ## Helm Chart Quick Start
 
 ```bash
@@ -56,6 +58,9 @@ kubectl get svc -n smart-redact
 
 # Check health
 kubectl exec -n smart-redact deploy/smart-redact-manager -- curl -s http://localhost:9982/healthz/ready
+
+# Access the HITL Web UI locally
+kubectl port-forward -n smart-redact svc/smart-redact-hitl-web 3000:3000
 ```
 
 ## Architecture on Kubernetes
@@ -67,11 +72,11 @@ kubectl exec -n smart-redact deploy/smart-redact-manager -- curl -s http://local
                            │
               ┌────────────┼────────────┐
               │            │            │
-    ┌─────────▼──┐  ┌──────▼─────┐  ┌──▼──────────┐
-    │  Manager   │  │Orchestrator│  │   Worker     │
-    │  Service   │  │  Service   │  │   Service    │
-    │  (9982)    │  │  (9983)    │  │   (4885)     │
-    └─────┬──────┘  └─────┬──────┘  └──────────────┘
+    ┌─────────▼──┐  ┌──────▼─────┐  ┌────▼──────┐  ┌──▼──────────┐
+    │  Manager   │  │Orchestrator│  │ HITL Web  │  │   Worker     │
+    │  Service   │  │  Service   │  │  Service  │  │   Service    │
+    │  (9982)    │  │  (9983)    │  │  (3000)   │  │   (4885)     │
+    └─────┬──────┘  └─────┬──────┘  └───────────┘  └──────────────┘
           │               │
     ┌─────▼──────┐  ┌─────▼──────┐
     │ PostgreSQL │  │ PostgreSQL │

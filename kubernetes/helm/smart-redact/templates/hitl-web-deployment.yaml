@@ -1,0 +1,57 @@
+{{- if .Values.hitlWeb.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smart-redact-hitl-web
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "smart-redact.labels" . | nindent 4 }}
+    app.kubernetes.io/component: hitl-web
+spec:
+  replicas: {{ .Values.hitlWeb.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "smart-redact.selectorLabels" (dict "component" "hitl-web" "Release" .Release) | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "smart-redact.selectorLabels" (dict "component" "hitl-web" "Release" .Release) | nindent 8 }}
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1654
+      containers:
+        - name: hitl-web
+          image: "{{ .Values.hitlWeb.image.repository }}:{{ .Values.hitlWeb.image.tag | default .Values.global.imageTag }}"
+          imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+          ports:
+            - containerPort: {{ .Values.hitlWeb.containerPort }}
+              protocol: TCP
+          env:
+            - name: ORCHESTRATOR_HOST
+              value: {{ .Values.hitlWeb.orchestratorHost | quote }}
+            - name: VITE_API_URL
+              value: {{ .Values.hitlWeb.orchestratorApiUrl | quote }}
+            - name: VITE_MANAGER_API_URL
+              value: {{ .Values.hitlWeb.managerApiUrl | quote }}
+            {{- range $key, $value := .Values.hitlWeb.extraEnv }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.hitlWeb.resources | nindent 12 }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.hitlWeb.healthcheck.path }}
+              port: {{ .Values.hitlWeb.containerPort }}
+            initialDelaySeconds: {{ .Values.hitlWeb.healthcheck.initialDelaySeconds }}
+            periodSeconds: {{ .Values.hitlWeb.healthcheck.periodSeconds }}
+            timeoutSeconds: {{ .Values.hitlWeb.healthcheck.timeoutSeconds }}
+            failureThreshold: {{ .Values.hitlWeb.healthcheck.failureThreshold }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.hitlWeb.healthcheck.path }}
+              port: {{ .Values.hitlWeb.containerPort }}
+            periodSeconds: 30
+            timeoutSeconds: 10
+{{- end }}
