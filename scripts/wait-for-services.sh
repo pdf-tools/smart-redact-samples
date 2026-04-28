@@ -3,11 +3,12 @@
 # Wait for Smart Redact services to become ready
 # =============================================================================
 # Usage:
-#   ./wait-for-services.sh                               # default 5 minute timeout
-#   ./wait-for-services.sh 120                           # custom timeout in seconds
-#   CHECK_ORCHESTRATOR=0 ./wait-for-services.sh          # minimal deployment
+#   ./wait-for-services.sh                                       # default 5 minute timeout
+#   ./wait-for-services.sh 120                                   # custom timeout in seconds
+#   CHECK_ORCHESTRATOR=0 CHECK_HITL=0 ./wait-for-services.sh     # minimal deployment
 #   CHECK_WORKER=1 WORKER_URL=http://localhost:4885 ./wait-for-services.sh
-#   CHECK_WORKER=0 ./wait-for-services.sh                # skip worker verification explicitly
+#   CHECK_WORKER=0 ./wait-for-services.sh                        # skip worker verification explicitly
+#   CHECK_HITL=0 ./wait-for-services.sh                          # skip HITL Web UI verification explicitly
 # =============================================================================
 set -euo pipefail
 
@@ -17,10 +18,13 @@ INTERVAL=5
 MANAGER_URL="${MANAGER_URL:-http://localhost:9982}"
 WORKER_URL="${WORKER_URL:-http://localhost:4885}"
 ORCHESTRATOR_URL="${ORCHESTRATOR_URL:-http://localhost:9983}"
+HITL_WEB_PORT="${HITL_WEB_PORT:-3000}"
+HITL_URL="${HITL_URL:-http://localhost:${HITL_WEB_PORT}}"
 WORKER_CONTAINER_NAME="${WORKER_CONTAINER_NAME:-smart-redact-worker}"
 CHECK_MANAGER="${CHECK_MANAGER:-1}"
 CHECK_WORKER="${CHECK_WORKER:-auto}"
 CHECK_ORCHESTRATOR="${CHECK_ORCHESTRATOR:-1}"
+CHECK_HITL="${CHECK_HITL:-1}"
 
 validate_binary_toggle() {
   case "$1" in
@@ -47,6 +51,12 @@ http_health_status() {
   curl -s -o /dev/null -w "%{http_code}" "${url}/healthz/ready" 2>/dev/null || echo "000"
 }
 
+http_status() {
+  local url="$1"
+  local path="$2"
+  curl -s -o /dev/null -w "%{http_code}" "${url}${path}" 2>/dev/null || echo "000"
+}
+
 wait_for_http_service() {
   local name="$1"
   local url="$2"
@@ -55,6 +65,27 @@ wait_for_http_service() {
   while [ "$elapsed" -lt "$TIMEOUT" ]; do
     local status
     status=$(http_health_status "$url")
+    if [ "$status" = "200" ]; then
+      echo "  $name is ready. (${elapsed}s)"
+      return 0
+    fi
+    sleep "$INTERVAL"
+    elapsed=$((elapsed + INTERVAL))
+  done
+
+  echo "  $name did not become ready within ${TIMEOUT}s."
+  return 1
+}
+
+wait_for_http_path() {
+  local name="$1"
+  local url="$2"
+  local path="$3"
+  local elapsed=0
+
+  while [ "$elapsed" -lt "$TIMEOUT" ]; do
+    local status
+    status=$(http_status "$url" "$path")
     if [ "$status" = "200" ]; then
       echo "  $name is ready. (${elapsed}s)"
       return 0
@@ -123,6 +154,7 @@ wait_for_worker_service() {
 
 validate_binary_toggle "$CHECK_MANAGER"
 validate_binary_toggle "$CHECK_ORCHESTRATOR"
+validate_binary_toggle "$CHECK_HITL"
 validate_worker_toggle "$CHECK_WORKER"
 
 echo "Waiting for Smart Redact services (timeout: ${TIMEOUT}s)..."
@@ -144,6 +176,11 @@ fi
 if [ "$CHECK_ORCHESTRATOR" = "1" ]; then
   checked=$((checked + 1))
   wait_for_http_service "Orchestrator " "$ORCHESTRATOR_URL" || failed=$((failed + 1))
+fi
+
+if [ "$CHECK_HITL" = "1" ]; then
+  checked=$((checked + 1))
+  wait_for_http_path "HITL Web UI  " "$HITL_URL" "/" || failed=$((failed + 1))
 fi
 
 echo ""

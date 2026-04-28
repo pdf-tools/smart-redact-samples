@@ -138,7 +138,6 @@ services:
     environment:
       ORCHESTRATOR_HOST: "smart-redact-orchestrator"
       VITE_API_URL: "${HITL_ORCHESTRATOR_URL:-http://localhost:9983}"
-      VITE_MANAGER_API_URL: "${HITL_MANAGER_URL:-http://localhost:9982}"
     networks:
       - smart-redact-network
     restart: unless-stopped

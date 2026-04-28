@@ -22,7 +22,6 @@ flowchart LR
     Browser -- HTTP --> HITL
     Client -- HTTP --> Manager
     HITL -- HTTP --> Orchestrator
-    HITL -- HTTP --> Manager
     Orchestrator -- HTTP --> Manager
     Manager -- HTTP --> Worker
     Orchestrator --- OrchDB
@@ -150,7 +149,6 @@ All Smart Redact services are configured via environment variables:
 | `VERSION` | No | Docker image tag (default: `latest`) |
 | `HITL_WEB_PORT` | No | Host port for the HITL Web UI (default: `3000`) |
 | `HITL_ORCHESTRATOR_URL` | No | Browser-facing Orchestrator API URL used by the HITL Web UI (default: `http://localhost:9983`) |
-| `HITL_MANAGER_URL` | No | Browser-facing Manager API URL used by the HITL Web UI (default: `http://localhost:9982`) |
 
 > For all configuration options, see [Smart Redact Configuration Guide](SMART_REDACT_DOCS_URL/configuration).
 
