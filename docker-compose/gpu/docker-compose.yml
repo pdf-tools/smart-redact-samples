@@ -1,7 +1,7 @@
 # =============================================================================
 # Smart Redact - Full Stack (GPU)
 # =============================================================================
-# Starts all services with GPU-accelerated Worker using NVIDIA CUDA.
+# Starts all services with GPU-accelerated Worker using NVIDIA CUDA, plus the HITL Web UI.
 #
 # Requirements:
 #   - NVIDIA GPU
@@ -14,6 +14,7 @@
 # Services:
 #   - Manager API:      http://localhost:9982  (Swagger: http://localhost:9982/swagger)
 #   - Orchestrator API: http://localhost:9983  (Swagger: http://localhost:9983/swagger)
+#   - HITL Web UI:      http://localhost:3000
 #   - Worker API:       internal only (port 4885)
 # =============================================================================
 
@@ -139,6 +140,31 @@ services:
       timeout: 15s
       start_period: 30s
       retries: 30
+
+  # ---------------------------------------------------------------------------
+  # HITL Web UI - Human-in-the-loop review interface
+  # ---------------------------------------------------------------------------
+  smart-redact-hitl-web:
+    image: pdftoolsag/smart-redact-hitl-web:${VERSION:-latest}
+    container_name: smart-redact-hitl-web
+    ports:
+      - "${HITL_WEB_PORT:-3000}:8080"
+    environment:
+      ORCHESTRATOR_HOST: "smart-redact-orchestrator"
+      VITE_API_URL: "${HITL_ORCHESTRATOR_URL:-http://localhost:9983}"
+      VITE_MANAGER_API_URL: "${HITL_MANAGER_URL:-http://localhost:9982}"
+    networks:
+      - smart-redact-network
+    restart: unless-stopped
+    depends_on:
+      smart-redact-orchestrator:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/ > /dev/null || exit 1"]
+      interval: 10s
+      timeout: 10s
+      start_period: 20s
+      retries: 12
 
   # ---------------------------------------------------------------------------
   # PostgreSQL - Manager database

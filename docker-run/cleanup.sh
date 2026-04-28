@@ -12,6 +12,7 @@ CONTAINERS=(
   smart-redact-manager
   smart-redact-worker
   smart-redact-orchestrator
+  smart-redact-hitl-web
   smart-redact-manager-db
   smart-redact-orchestrator-db
 )

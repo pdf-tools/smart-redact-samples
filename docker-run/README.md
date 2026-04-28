@@ -47,15 +47,18 @@ docker inspect --format='{{.State.Health.Status}}' smart-redact-worker
 
 # 5. Orchestrator (depends on Orchestrator DB and Manager)
 ./run-orchestrator.sh
+
+# 6. HITL Web UI (depends on Orchestrator)
+./run-hitl-web.sh
 ```
 
 ## Stopping Services
 
 ```bash
-docker stop smart-redact-manager smart-redact-worker smart-redact-orchestrator \
+docker stop smart-redact-manager smart-redact-worker smart-redact-orchestrator smart-redact-hitl-web \
            smart-redact-manager-db smart-redact-orchestrator-db
 
-docker rm smart-redact-manager smart-redact-worker smart-redact-orchestrator \
+docker rm smart-redact-manager smart-redact-worker smart-redact-orchestrator smart-redact-hitl-web \
          smart-redact-manager-db smart-redact-orchestrator-db
 ```
 

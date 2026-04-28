@@ -6,30 +6,27 @@ Smart Redact automatically detects and redacts personally identifiable informati
 
 ## Architecture
 
-Smart Redact consists of three services:
+Smart Redact consists of four services:
 
-```
-                          ┌─────────────────────┐
-                          │   Orchestrator API   │
-                          │     (port 9983)      │
-                          │  User management,    │
-                          │  JWT auth, Web UI    │
-                          │  backend             │
-                          └──────────┬───────────┘
-                                     │ HTTP
-┌──────────┐    HTTP     ┌───────────▼───────────┐    HTTP     ┌────────────────────┐
-│  Client   ├───────────►│     Manager API       ├───────────►│    Worker API       │
-│           │            │     (port 9982)       │            │    (port 4885)      │
-│           │            │  Files, Jobs,         │            │  PII Detection,     │
-│           │            │  Orchestration        │            │  Redaction,         │
-│           │            │                       │            │  GLiNER ML Model    │
-└──────────┘            └───────────┬───────────┘            └────────────────────┘
-                                     │
-                          ┌──────────▼───────────┐
-                          │    PostgreSQL (x2)    │
-                          │  Manager DB           │
-                          │  Orchestrator DB      │
-                          └──────────────────────┘
+```mermaid
+flowchart LR
+    Browser["Browser User"]
+    Client["API Client<br/>(curl / Python / C#)"]
+    HITL["HITL Web UI<br/>port 3000"]
+    Orchestrator["Orchestrator API<br/>port 9983<br/>User mgmt, JWT auth"]
+    Manager["Manager API<br/>port 9982<br/>Files, Jobs, Orchestration"]
+    Worker["Worker API<br/>port 4885 (internal)<br/>PII detection, redaction"]
+    OrchDB[("Orchestrator DB<br/>PostgreSQL")]
+    ManagerDB[("Manager DB<br/>PostgreSQL")]
+
+    Browser -- HTTP --> HITL
+    Client -- HTTP --> Manager
+    HITL -- HTTP --> Orchestrator
+    HITL -- HTTP --> Manager
+    Orchestrator -- HTTP --> Manager
+    Manager -- HTTP --> Worker
+    Orchestrator --- OrchDB
+    Manager --- ManagerDB
 ```
 
 | Service | Port | Description |
@@ -37,6 +34,7 @@ Smart Redact consists of three services:
 | **Manager** | 9982 | Client-facing API for file uploads and detection/redaction jobs |
 | **Worker** | 4885 | Internal service that performs PII detection and redaction |
 | **Orchestrator** | 9983 | Web UI backend with user management and JWT authentication |
+| **HITL Web UI** | 3000 | Human-in-the-loop review interface for detection results and redaction jobs |
 
 > For detailed architecture documentation, see [Smart Redact Architecture](SMART_REDACT_DOCS_URL/architecture).
 
@@ -44,6 +42,7 @@ Smart Redact consists of three services:
 
 - [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) v2+
 - A valid Smart Redact license key ([get one here](SMART_REDACT_DOCS_URL/licensing))
+- Docker Hub access to the `pdftoolsag` images. If the images are private, run `docker login` before `docker compose up` or `docker run`.
 - For GPU acceleration: NVIDIA GPU with [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html)
 
 ## Windows Users
@@ -94,6 +93,11 @@ docker compose up -d
 Once running:
 - **Manager API (Swagger):** http://localhost:9982/swagger
 - **Orchestrator API (Swagger):** http://localhost:9983/swagger
+- **HITL Web UI:** http://localhost:3000
+
+Default HITL / Orchestrator login:
+- **Username:** `admin`
+- **Password:** `Admin1234`
 
 ## Repository Structure
 
@@ -144,6 +148,9 @@ All Smart Redact services are configured via environment variables:
 | `ENCRYPTION_KEY` | Yes | 32-byte Base64-encoded AES-256-GCM key |
 | `ORCHESTRATOR_JWT_SECRET` | Yes* | JWT signing secret (min 32 chars). *Only for Orchestrator. |
 | `VERSION` | No | Docker image tag (default: `latest`) |
+| `HITL_WEB_PORT` | No | Host port for the HITL Web UI (default: `3000`) |
+| `HITL_ORCHESTRATOR_URL` | No | Browser-facing Orchestrator API URL used by the HITL Web UI (default: `http://localhost:9983`) |
+| `HITL_MANAGER_URL` | No | Browser-facing Manager API URL used by the HITL Web UI (default: `http://localhost:9982`) |
 
 > For all configuration options, see [Smart Redact Configuration Guide](SMART_REDACT_DOCS_URL/configuration).
 
