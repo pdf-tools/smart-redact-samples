@@ -109,9 +109,7 @@ smart-redact-samples/
 ├── api-examples/            # API usage examples
 │   ├── curl/                #   Shell scripts (step-by-step)
 │   ├── python/              #   Python examples
-│   └── postman/             #   Postman collections
-│
-├── opentelemetry/           # OpenTelemetry integration examples
+│   └── csharp/              #   C# / .NET example
 │
 └── scripts/                 # Utility scripts
 ```
@@ -146,8 +144,6 @@ All Smart Redact services are configured via environment variables:
 | `ENCRYPTION_KEY` | Yes | 32-byte Base64-encoded AES-256-GCM key |
 | `ORCHESTRATOR_JWT_SECRET` | Yes* | JWT signing secret (min 32 chars). *Only for Orchestrator. |
 | `VERSION` | No | Docker image tag (default: `latest`) |
-| `OTEL_EXPORTER_OTLP_ENDPOINT` | No | OpenTelemetry collector endpoint |
-| `OTEL_EXPORTER_OTLP_PROTOCOL` | No | OpenTelemetry protocol (`grpc` or `http/protobuf`) |
 
 > For all configuration options, see [Smart Redact Configuration Guide](SMART_REDACT_DOCS_URL/configuration).
 
@@ -158,7 +154,6 @@ All Smart Redact services are configured via environment variables:
 - [API Reference](SMART_REDACT_DOCS_URL/api-reference)
 - [Architecture](SMART_REDACT_DOCS_URL/architecture)
 - [Licensing](SMART_REDACT_DOCS_URL/licensing)
-- [Observability / OpenTelemetry](SMART_REDACT_DOCS_URL/observability)
 
 ## License
 

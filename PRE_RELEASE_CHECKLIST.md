@@ -17,7 +17,6 @@ Delete this file before publishing.
   - `api-examples/README.md`, `api-examples/csharp/README.md`, `api-examples/csharp/Program.cs`
   - `api-examples/python/detect_pii.py`, `api-examples/python/redact_pii.py`, `api-examples/python/full_workflow.py`
   - `docker-compose/README.md`
-  - `opentelemetry/README.md`
 - [x] Replace `<repo-url>` in `README.md` with `https://github.com/pdf-tools/smart-redact-samples.git`.
 
 ## Content fixes
@@ -29,8 +28,6 @@ Delete this file before publishing.
   - `api-examples/python/full_workflow.py`
   - `api-examples/csharp/README.md`
 - [x] Added a timeout guard (`WORKER_HEALTH_TIMEOUT_SECONDS`, default 300s) to the worker health wait loop in `docker-run/run-all.sh`.
-- [x] Softened Postman demo passwords in `api-examples/postman/Smart-Redact-Orchestrator.postman_collection.json` (replaced with `<choose-a-strong-password>` / `<choose-a-new-strong-password>` placeholders). Default `admin / Admin1234` bootstrap credential kept as-is.
-
 ## Repository hygiene
 
 - [x] Committed the previously untracked files:
@@ -52,7 +49,6 @@ Delete this file before publishing.
 - [ ] Run `bash api-examples/curl/full-workflow.sh <some.pdf>` end-to-end against a pristine stack.
 - [ ] Run `python3 api-examples/python/full_workflow.py <some.pdf>` end-to-end.
 - [ ] Run `dotnet run --project api-examples/csharp/ -- <some.pdf>` end-to-end.
-- [ ] `docker run --rm otel/opentelemetry-collector-contrib:<pinned-version> validate --config=/cfg/config.yaml` passes for `opentelemetry/otel-collector-config.yaml` and each `opentelemetry/examples/*.yaml`.
 - [ ] Smoke-test the quick start on a Windows machine using Git Bash (or at minimum WSL2). Verify `scripts/generate-encryption-key.ps1` runs from PowerShell and produces a valid 32-byte base64 key.
 
 ## Publishing

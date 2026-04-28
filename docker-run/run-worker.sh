@@ -23,8 +23,6 @@ docker run -d \
   -e "Encryption__DekTokenTtlMinutes=1440" \
   -e "FileStorage__FileStorageType=HostFileSystem" \
   -e "FileStorage__FilesDirectoryPath=/app/storage_folder" \
-  -e "OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT:-}" \
-  -e "OTEL_EXPORTER_OTLP_PROTOCOL=${OTEL_EXPORTER_OTLP_PROTOCOL:-}" \
   -v smart-redact-storage:/app/storage_folder \
   -v smart-redact-logs:/app/logs \
   --health-cmd "curl -f http://localhost:4885/healthz/ready || exit 1" \

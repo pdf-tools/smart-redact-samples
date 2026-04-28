@@ -27,8 +27,6 @@ docker run -d \
   -e "Encryption__EncryptionKey=${ENCRYPTION_KEY}" \
   -e "Encryption__DekTokenTtlMinutes=1440" \
   -e "Licensing__LicenseKey=${PII_SERVICE_LICENSE_KEY}" \
-  -e "OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT:-}" \
-  -e "OTEL_EXPORTER_OTLP_PROTOCOL=${OTEL_EXPORTER_OTLP_PROTOCOL:-}" \
   -v smart-redact-storage:/app/storage_folder \
   -v smart-redact-logs:/app/logs \
   --health-cmd "curl -f http://localhost:9982/healthz/ready || exit 1" \

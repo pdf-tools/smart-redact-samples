@@ -50,8 +50,6 @@ services:
       Encryption__EncryptionKey: "${ENCRYPTION_KEY}"
       Encryption__DekTokenTtlMinutes: 1440
       Licensing__LicenseKey: "${PII_SERVICE_LICENSE_KEY}"
-      OTEL_EXPORTER_OTLP_ENDPOINT: "${OTEL_EXPORTER_OTLP_ENDPOINT:-}"
-      OTEL_EXPORTER_OTLP_PROTOCOL: "${OTEL_EXPORTER_OTLP_PROTOCOL:-}"
     volumes:
       - storage:/app/storage_folder
       - logs:/app/logs
@@ -89,8 +87,6 @@ services:
       Inference__ExecutionProvider: "Auto"
       NVIDIA_VISIBLE_DEVICES: all
       NVIDIA_DRIVER_CAPABILITIES: compute,utility
-      OTEL_EXPORTER_OTLP_ENDPOINT: "${OTEL_EXPORTER_OTLP_ENDPOINT:-}"
-      OTEL_EXPORTER_OTLP_PROTOCOL: "${OTEL_EXPORTER_OTLP_PROTOCOL:-}"
     volumes:
       - storage:/app/storage_folder
       - logs:/app/logs
