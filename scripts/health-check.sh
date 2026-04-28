@@ -44,13 +44,17 @@ validate_worker_toggle() {
 
 http_health_status() {
   local url="$1"
-  curl -s -o /dev/null -w "%{http_code}" "${url}/healthz/ready" 2>/dev/null || echo "000"
+  local code
+  code=$(curl -s -o /dev/null -w "%{http_code}" "${url}/healthz/ready" 2>/dev/null) || true
+  echo "${code:-000}"
 }
 
 http_status() {
   local url="$1"
   local path="$2"
-  curl -s -o /dev/null -w "%{http_code}" "${url}${path}" 2>/dev/null || echo "000"
+  local code
+  code=$(curl -s -o /dev/null -w "%{http_code}" "${url}${path}" 2>/dev/null) || true
+  echo "${code:-000}"
 }
 
 check_http_health() {
