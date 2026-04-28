@@ -106,10 +106,6 @@ smart-redact-samples/
 │
 ├── docker-run/              # Individual docker run scripts
 │
-├── kubernetes/              # Kubernetes deployments
-│   ├── helm/                #   Helm chart
-│   └── plain-manifests/     #   Plain YAML + Kustomize
-│
 ├── api-examples/            # API usage examples
 │   ├── curl/                #   Shell scripts (step-by-step)
 │   ├── python/              #   Python examples
@@ -128,8 +124,6 @@ smart-redact-samples/
 | [Docker Compose (GPU)](docker-compose/gpu/) | Production with GPU acceleration | [Guide](docker-compose/README.md) |
 | [Docker Compose (Minimal)](docker-compose/minimal/) | API-only usage without Orchestrator | [Guide](docker-compose/README.md) |
 | [Docker Run](docker-run/) | Manual control over each container | [Guide](docker-run/README.md) |
-| [Kubernetes (Helm)](kubernetes/helm/) | Production Kubernetes clusters | [Guide](kubernetes/README.md) |
-| [Kubernetes (Plain YAML)](kubernetes/plain-manifests/) | Kubernetes without Helm | [Guide](kubernetes/README.md) |
 
 ## API Examples
 
