@@ -11,7 +11,6 @@ Usage examples for the Smart Redact Manager API.
 | **curl** | [curl/](curl/) | Shell scripts for each API step |
 | **C#** | [csharp/](csharp/) | .NET console app using `HttpClient` |
 | **Python** | [python/](python/) | Python scripts using `requests` |
-| **Postman** | [postman/](postman/) | Importable Postman collections |
 
 ## Typical Workflow
 

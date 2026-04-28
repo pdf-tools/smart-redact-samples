@@ -46,8 +46,6 @@ services:
       Encryption__EncryptionKey: "${ENCRYPTION_KEY}"
       Encryption__DekTokenTtlMinutes: 1440
       Licensing__LicenseKey: "${PII_SERVICE_LICENSE_KEY}"
-      OTEL_EXPORTER_OTLP_ENDPOINT: "${OTEL_EXPORTER_OTLP_ENDPOINT:-}"
-      OTEL_EXPORTER_OTLP_PROTOCOL: "${OTEL_EXPORTER_OTLP_PROTOCOL:-}"
     volumes:
       - storage:/app/storage_folder
       - logs:/app/logs
@@ -82,8 +80,6 @@ services:
       Encryption__DekTokenTtlMinutes: 1440
       FileStorage__FileStorageType: "HostFileSystem"
       FileStorage__FilesDirectoryPath: "/app/storage_folder"
-      OTEL_EXPORTER_OTLP_ENDPOINT: "${OTEL_EXPORTER_OTLP_ENDPOINT:-}"
-      OTEL_EXPORTER_OTLP_PROTOCOL: "${OTEL_EXPORTER_OTLP_PROTOCOL:-}"
     volumes:
       - storage:/app/storage_folder
       - logs:/app/logs

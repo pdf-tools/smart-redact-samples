@@ -85,14 +85,3 @@ docker compose down
 # Stop and remove containers AND data volumes
 docker compose down -v
 ```
-
-## Adding OpenTelemetry
-
-To enable telemetry export, uncomment the OTEL variables in your `.env` file:
-
-```bash
-OTEL_EXPORTER_OTLP_ENDPOINT=http://your-otel-collector:4317
-OTEL_EXPORTER_OTLP_PROTOCOL=grpc
-```
-
-See [opentelemetry/](../opentelemetry/) for collector configuration examples.

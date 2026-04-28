@@ -106,16 +106,10 @@ smart-redact-samples/
 │
 ├── docker-run/              # Individual docker run scripts
 │
-├── kubernetes/              # Kubernetes deployments
-│   ├── helm/                #   Helm chart
-│   └── plain-manifests/     #   Plain YAML + Kustomize
-│
 ├── api-examples/            # API usage examples
 │   ├── curl/                #   Shell scripts (step-by-step)
 │   ├── python/              #   Python examples
-│   └── postman/             #   Postman collections
-│
-├── opentelemetry/           # OpenTelemetry integration examples
+│   └── csharp/              #   C# / .NET example
 │
 └── scripts/                 # Utility scripts
 ```
@@ -128,8 +122,6 @@ smart-redact-samples/
 | [Docker Compose (GPU)](docker-compose/gpu/) | Production with GPU acceleration | [Guide](docker-compose/README.md) |
 | [Docker Compose (Minimal)](docker-compose/minimal/) | API-only usage without Orchestrator | [Guide](docker-compose/README.md) |
 | [Docker Run](docker-run/) | Manual control over each container | [Guide](docker-run/README.md) |
-| [Kubernetes (Helm)](kubernetes/helm/) | Production Kubernetes clusters | [Guide](kubernetes/README.md) |
-| [Kubernetes (Plain YAML)](kubernetes/plain-manifests/) | Kubernetes without Helm | [Guide](kubernetes/README.md) |
 
 ## API Examples
 
@@ -152,8 +144,6 @@ All Smart Redact services are configured via environment variables:
 | `ENCRYPTION_KEY` | Yes | 32-byte Base64-encoded AES-256-GCM key |
 | `ORCHESTRATOR_JWT_SECRET` | Yes* | JWT signing secret (min 32 chars). *Only for Orchestrator. |
 | `VERSION` | No | Docker image tag (default: `latest`) |
-| `OTEL_EXPORTER_OTLP_ENDPOINT` | No | OpenTelemetry collector endpoint |
-| `OTEL_EXPORTER_OTLP_PROTOCOL` | No | OpenTelemetry protocol (`grpc` or `http/protobuf`) |
 
 > For all configuration options, see [Smart Redact Configuration Guide](SMART_REDACT_DOCS_URL/configuration).
 
@@ -164,7 +154,6 @@ All Smart Redact services are configured via environment variables:
 - [API Reference](SMART_REDACT_DOCS_URL/api-reference)
 - [Architecture](SMART_REDACT_DOCS_URL/architecture)
 - [Licensing](SMART_REDACT_DOCS_URL/licensing)
-- [Observability / OpenTelemetry](SMART_REDACT_DOCS_URL/observability)
 
 ## License
 

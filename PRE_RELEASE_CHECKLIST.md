@@ -11,21 +11,16 @@ Delete this file before publishing.
 
 ## Documentation placeholders
 
-- [ ] Replace all `SMART_REDACT_DOCS_URL` occurrences (27 instances across 13 files) with the final public documentation base URL. Affected:
+- [ ] Replace all `SMART_REDACT_DOCS_URL` occurrences with the final public documentation base URL. Affected:
   - `README.md`
   - `.env.example`
   - `api-examples/README.md`, `api-examples/csharp/README.md`, `api-examples/csharp/Program.cs`
   - `api-examples/python/detect_pii.py`, `api-examples/python/redact_pii.py`, `api-examples/python/full_workflow.py`
-  - `ci-cd/README.md`
   - `docker-compose/README.md`
-  - `kubernetes/README.md`
-  - `opentelemetry/README.md`
 - [x] Replace `<repo-url>` in `README.md` with `https://github.com/pdf-tools/smart-redact-samples.git`.
-- [x] Replace `nicerhugs` placeholder in `kubernetes/helm/smart-redact/Chart.yaml` `sources:` field with `https://github.com/pdf-tools/smart-redact-samples`.
 
 ## Content fixes
 
-- [x] Removed hardcoded `postgres-password="smartredact"` from `ci-cd/github-actions/deploy.yml` and `ci-cd/gitlab-ci/.gitlab-ci.yml` (now sourced from `POSTGRES_PASSWORD` CI secret/variable; documented in `ci-cd/README.md`). `kubernetes/README.md` now generates the password via `openssl rand`.
 - [x] Added a note in `docker-compose/README.md` explaining that the default postgres password `smartredact` in `docker-compose/*/docker-compose.yml` is for local demonstration only and must be changed for production.
 - [x] Aligned documented HTTP timeout default with the code (now 120s in all docs):
   - `api-examples/python/detect_pii.py`
@@ -33,14 +28,11 @@ Delete this file before publishing.
   - `api-examples/python/full_workflow.py`
   - `api-examples/csharp/README.md`
 - [x] Added a timeout guard (`WORKER_HEALTH_TIMEOUT_SECONDS`, default 300s) to the worker health wait loop in `docker-run/run-all.sh`.
-- [x] Softened Postman demo passwords in `api-examples/postman/Smart-Redact-Orchestrator.postman_collection.json` (replaced with `<choose-a-strong-password>` / `<choose-a-new-strong-password>` placeholders). Default `admin / Admin1234` bootstrap credential kept as-is.
-
 ## Repository hygiene
 
 - [x] Committed the previously untracked files:
   - `.gitignore`
   - `docker-run/run-storage-init.sh`
-  - `kubernetes/helm/smart-redact/templates/NOTES.txt`
 - [x] Cleaned up git history — single `Add Smart Redact samples` commit via orphan branch. Any future internal work-in-progress will be squashed again before publishing.
 
 ## Licensing and policies
@@ -48,7 +40,7 @@ Delete this file before publishing.
 - [ ] Add a top-level `LICENSE` file. Recommendation: **MIT** (standard for vendor sample repos, most permissive, widest downstream use). Apache-2.0 if an explicit patent grant is required. Confirm with Legal.
 - [ ] Add `SECURITY.md` with instructions for reporting security vulnerabilities (private disclosure address, expected response time).
 - [ ] Confirm that publishing these sample configurations as open source is approved (contracts, product, legal).
-- [ ] Confirm trademark usage of `PDF Tools` / `Smart Redact` in the README / Chart.yaml metadata.
+- [ ] Confirm trademark usage of `PDF Tools` / `Smart Redact` in the README metadata.
 
 ## Final verification (to be repeated close to release)
 
@@ -57,10 +49,6 @@ Delete this file before publishing.
 - [ ] Run `bash api-examples/curl/full-workflow.sh <some.pdf>` end-to-end against a pristine stack.
 - [ ] Run `python3 api-examples/python/full_workflow.py <some.pdf>` end-to-end.
 - [ ] Run `dotnet run --project api-examples/csharp/ -- <some.pdf>` end-to-end.
-- [ ] `helm lint kubernetes/helm/smart-redact` clean.
-- [ ] `helm template smart-redact kubernetes/helm/smart-redact --values kubernetes/helm/smart-redact/values.yaml` renders without errors for default, GPU, and minimal values files.
-- [ ] `kubectl kustomize kubernetes/plain-manifests` renders without errors.
-- [ ] `docker run --rm otel/opentelemetry-collector-contrib:<pinned-version> validate --config=/cfg/config.yaml` passes for `opentelemetry/otel-collector-config.yaml` and each `opentelemetry/examples/*.yaml`.
 - [ ] Smoke-test the quick start on a Windows machine using Git Bash (or at minimum WSL2). Verify `scripts/generate-encryption-key.ps1` runs from PowerShell and produces a valid 32-byte base64 key.
 
 ## Publishing
