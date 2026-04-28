@@ -8,34 +8,25 @@ Smart Redact automatically detects and redacts personally identifiable informati
 
 Smart Redact consists of four services:
 
-```
-                          ┌─────────────────────┐
-                          │   Orchestrator API   │
-                          │     (port 9983)      │
-                          │  User management,    │
-                          │  JWT auth, Web UI    │
-                          │  backend             │
-                          └──────────┬───────────┘
-                                     │ HTTP
-                          ┌──────────▲───────────┐
-                          │      HITL Web UI      │
-                          │      (port 3000)      │
-                          │ Human review workflow │
-                          └──────────────────────┘
-                                     │ HTTP
-┌──────────┐    HTTP     ┌───────────▼───────────┐    HTTP     ┌────────────────────┐
-│  Client   ├───────────►│     Manager API       ├───────────►│    Worker API       │
-│           │            │     (port 9982)       │            │    (port 4885)      │
-│           │            │  Files, Jobs,         │            │  PII Detection,     │
-│           │            │  Orchestration        │            │  Redaction,         │
-│           │            │                       │            │  GLiNER ML Model    │
-└──────────┘            └───────────┬───────────┘            └────────────────────┘
-                                     │
-                          ┌──────────▼───────────┐
-                          │    PostgreSQL (x2)    │
-                          │  Manager DB           │
-                          │  Orchestrator DB      │
-                          └──────────────────────┘
+```mermaid
+flowchart LR
+    Browser["Browser User"]
+    Client["API Client<br/>(curl / Python / C#)"]
+    HITL["HITL Web UI<br/>port 3000"]
+    Orchestrator["Orchestrator API<br/>port 9983<br/>User mgmt, JWT auth"]
+    Manager["Manager API<br/>port 9982<br/>Files, Jobs, Orchestration"]
+    Worker["Worker API<br/>port 4885 (internal)<br/>PII detection, redaction"]
+    OrchDB[("Orchestrator DB<br/>PostgreSQL")]
+    ManagerDB[("Manager DB<br/>PostgreSQL")]
+
+    Browser -- HTTP --> HITL
+    Client -- HTTP --> Manager
+    HITL -- HTTP --> Orchestrator
+    HITL -- HTTP --> Manager
+    Orchestrator -- HTTP --> Manager
+    Manager -- HTTP --> Worker
+    Orchestrator --- OrchDB
+    Manager --- ManagerDB
 ```
 
 | Service | Port | Description |
