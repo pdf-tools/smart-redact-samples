@@ -14,6 +14,7 @@ FORCE=0
 VOLUMES=0
 TIMEOUT=300
 LOG_SERVICES=()
+LOG_SERVICE_COUNT=0
 
 usage() {
   cat <<'USAGE'
@@ -115,6 +116,7 @@ while [ "$#" -gt 0 ]; do
         COMMAND="$1"
       elif [ "$COMMAND" = "logs" ]; then
         LOG_SERVICES+=("$1")
+        LOG_SERVICE_COUNT=$((LOG_SERVICE_COUNT + 1))
       else
         die "Unknown argument: $1"
       fi
@@ -355,11 +357,10 @@ cmd_compose_logs() {
   local services=()
   local svc
 
-  for svc in "${LOG_SERVICES[@]}"; do
-    services+=("$(container_for_service "$svc")")
-  done
-
-  if [ "${#services[@]}" -gt 0 ]; then
+  if [ "$LOG_SERVICE_COUNT" -gt 0 ]; then
+    for svc in "${LOG_SERVICES[@]}"; do
+      services+=("$(container_for_service "$svc")")
+    done
     ids="$(run_compose ps -q "${services[@]}" 2>/dev/null || true)"
     [ -n "$ids" ] || die "No running Compose containers found for: ${services[*]}"
     run_compose logs -f --tail 200 "${services[@]}" &
@@ -373,7 +374,7 @@ cmd_compose_logs() {
   trap 'kill "$logs_pid" 2>/dev/null || true' INT TERM EXIT
 
   while kill -0 "$logs_pid" 2>/dev/null; do
-    if [ "${#services[@]}" -gt 0 ]; then
+    if [ "$LOG_SERVICE_COUNT" -gt 0 ]; then
       ids="$(run_compose ps -q "${services[@]}" 2>/dev/null || true)"
     else
       ids="$(run_compose ps -q 2>/dev/null || true)"
@@ -512,8 +513,10 @@ container_for_service() {
 
 cmd_docker_run_logs() {
   require_docker
-  local containers=() service container pid pids=()
-  if [ "${#LOG_SERVICES[@]}" -gt 0 ]; then
+  local containers=() service container pids=()
+  local pids_count=0
+
+  if [ "$LOG_SERVICE_COUNT" -gt 0 ]; then
     for service in "${LOG_SERVICES[@]}"; do
       containers+=("$(container_for_service "$service")")
     done
@@ -532,12 +535,13 @@ cmd_docker_run_logs() {
     if docker ps -a --format '{{.Names}}' | grep -q "^${container}$"; then
       docker logs -f --tail 200 "$container" &
       pids+=("$!")
+      pids_count=$((pids_count + 1))
     else
       echo "Skipping missing container: $container" >&2
     fi
   done
 
-  [ "${#pids[@]}" -gt 0 ] || die "No matching docker-run containers found."
+  [ "$pids_count" -gt 0 ] || die "No matching docker-run containers found."
   trap 'kill "${pids[@]}" 2>/dev/null || true' INT TERM EXIT
   wait
 }
