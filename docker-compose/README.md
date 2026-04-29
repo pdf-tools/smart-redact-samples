@@ -67,24 +67,24 @@ The CPU and GPU full-stack variants start the human-in-the-loop review UI at `ht
 |----------|---------|-------------|
 | `HITL_WEB_PORT` | `3000` | Host port mapped to the HITL Web UI container |
 | `HITL_ORCHESTRATOR_URL` | `http://localhost:9983` | Browser-facing Orchestrator API URL |
-| `HITL_MANAGER_URL` | `http://localhost:9982` | Browser-facing Manager API URL |
 
-When the stack is exposed through a remote host or reverse proxy, set the two URL variables to the externally reachable API URLs.
+When the stack is exposed through a remote host or reverse proxy, set `HITL_ORCHESTRATOR_URL` to the externally reachable Orchestrator URL. The HITL Web UI talks to the Manager only indirectly, through the Orchestrator.
 
 > **Note:** The provided `docker-compose.yml` files hardcode the PostgreSQL password as `smartredact` for local demonstration only. For any non-local deployment, replace it with a strong, per-environment value (e.g. `openssl rand -base64 32 | tr -d '=+/' | head -c 32`) and inject it via your secret store rather than committing it.
 
 ## Verifying the Deployment
 
 ```bash
-# Full stack (Manager + Worker + Orchestrator)
+# Full stack (Manager + Worker + Orchestrator + HITL Web UI)
 ../../scripts/health-check.sh
 
-# Minimal stack (Manager + internal Worker)
-CHECK_ORCHESTRATOR=0 ../../scripts/health-check.sh
+# Minimal stack (Manager + internal Worker, no Orchestrator, no HITL)
+CHECK_ORCHESTRATOR=0 CHECK_HITL=0 ../../scripts/health-check.sh
 
 # Or check individually
 curl -s http://localhost:9982/healthz/ready    # Manager
 curl -s http://localhost:9983/healthz/ready    # Orchestrator
+curl -s http://localhost:3000/                 # HITL Web UI
 ```
 
 Open `http://localhost:3000` to use the HITL Web UI.

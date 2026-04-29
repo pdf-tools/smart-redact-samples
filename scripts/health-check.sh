@@ -3,20 +3,24 @@
 # Check health of Smart Redact services that are reachable from the host
 # =============================================================================
 # Usage:
-#   ./health-check.sh                               # full Docker samples
-#   CHECK_ORCHESTRATOR=0 ./health-check.sh          # minimal deployment
+#   ./health-check.sh                                       # full Docker samples
+#   CHECK_ORCHESTRATOR=0 CHECK_HITL=0 ./health-check.sh     # minimal deployment
 #   CHECK_WORKER=1 WORKER_URL=http://localhost:4885 ./health-check.sh
-#   CHECK_WORKER=0 ./health-check.sh                # skip worker verification explicitly
+#   CHECK_WORKER=0 ./health-check.sh                        # skip worker verification explicitly
+#   CHECK_HITL=0 ./health-check.sh                          # skip HITL Web UI verification explicitly
 # =============================================================================
 set -euo pipefail
 
 MANAGER_URL="${MANAGER_URL:-http://localhost:9982}"
 WORKER_URL="${WORKER_URL:-http://localhost:4885}"
 ORCHESTRATOR_URL="${ORCHESTRATOR_URL:-http://localhost:9983}"
+HITL_WEB_PORT="${HITL_WEB_PORT:-3000}"
+HITL_URL="${HITL_URL:-http://localhost:${HITL_WEB_PORT}}"
 WORKER_CONTAINER_NAME="${WORKER_CONTAINER_NAME:-smart-redact-worker}"
 CHECK_MANAGER="${CHECK_MANAGER:-1}"
 CHECK_WORKER="${CHECK_WORKER:-auto}"
 CHECK_ORCHESTRATOR="${CHECK_ORCHESTRATOR:-1}"
+CHECK_HITL="${CHECK_HITL:-1}"
 
 validate_binary_toggle() {
   case "$1" in
@@ -40,7 +44,17 @@ validate_worker_toggle() {
 
 http_health_status() {
   local url="$1"
-  curl -s -o /dev/null -w "%{http_code}" "${url}/healthz/ready" 2>/dev/null || echo "000"
+  local code
+  code=$(curl -s -o /dev/null -w "%{http_code}" "${url}/healthz/ready" 2>/dev/null) || true
+  echo "${code:-000}"
+}
+
+http_status() {
+  local url="$1"
+  local path="$2"
+  local code
+  code=$(curl -s -o /dev/null -w "%{http_code}" "${url}${path}" 2>/dev/null) || true
+  echo "${code:-000}"
 }
 
 check_http_health() {
@@ -49,6 +63,23 @@ check_http_health() {
 
   local status
   status=$(http_health_status "$url")
+
+  if [ "$status" = "200" ]; then
+    echo "  $name: HEALTHY"
+    return 0
+  else
+    echo "  $name: UNHEALTHY (HTTP $status)"
+    return 1
+  fi
+}
+
+check_http_path() {
+  local name="$1"
+  local url="$2"
+  local path="$3"
+
+  local status
+  status=$(http_status "$url" "$path")
 
   if [ "$status" = "200" ]; then
     echo "  $name: HEALTHY"
@@ -125,6 +156,7 @@ check_worker_health() {
 
 validate_binary_toggle "$CHECK_MANAGER"
 validate_binary_toggle "$CHECK_ORCHESTRATOR"
+validate_binary_toggle "$CHECK_HITL"
 validate_worker_toggle "$CHECK_WORKER"
 
 echo "Smart Redact Health Check"
@@ -147,6 +179,11 @@ fi
 if [ "$CHECK_ORCHESTRATOR" = "1" ]; then
   checked=$((checked + 1))
   check_http_health "Orchestrator (${ORCHESTRATOR_URL})" "$ORCHESTRATOR_URL" || failed=$((failed + 1))
+fi
+
+if [ "$CHECK_HITL" = "1" ]; then
+  checked=$((checked + 1))
+  check_http_path "HITL Web UI  (${HITL_URL})" "$HITL_URL" "/" || failed=$((failed + 1))
 fi
 
 echo ""

@@ -8,7 +8,6 @@ VERSION="${VERSION:-latest}"
 NETWORK="smart-redact-network"
 HITL_WEB_PORT="${HITL_WEB_PORT:-3000}"
 HITL_ORCHESTRATOR_URL="${HITL_ORCHESTRATOR_URL:-http://localhost:9983}"
-HITL_MANAGER_URL="${HITL_MANAGER_URL:-http://localhost:9982}"
 
 docker network inspect "$NETWORK" >/dev/null 2>&1 || \
   docker network create "$NETWORK"
@@ -21,7 +20,6 @@ docker run -d \
   -p "${HITL_WEB_PORT}:8080" \
   -e "ORCHESTRATOR_HOST=smart-redact-orchestrator" \
   -e "VITE_API_URL=${HITL_ORCHESTRATOR_URL}" \
-  -e "VITE_MANAGER_API_URL=${HITL_MANAGER_URL}" \
   --health-cmd 'wget -qO- http://127.0.0.1:8080/ > /dev/null || exit 1' \
   --health-interval 10s \
   --health-timeout 10s \
