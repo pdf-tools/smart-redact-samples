@@ -46,19 +46,10 @@ flowchart LR
 
 ## Windows Users
 
-All shell scripts in this repository (`scripts/*.sh`, `docker-run/*.sh`, `api-examples/curl/*.sh`) are bash-based. On Windows, use one of:
+All startup and API example scripts are bash-based. On Windows, use one of:
 
 - **WSL2** (recommended) — full Linux environment. Docker Desktop integrates with WSL2 natively, so `docker` commands just work.
 - **Git Bash** — bundled with [Git for Windows](https://git-scm.com/download/win). Sufficient for all Docker-based scripts in this repo, provided Docker Desktop is running and `python3` is available on `PATH` (needed by the curl API examples).
-
-A PowerShell equivalent is provided for the one script that runs before Docker is involved:
-
-```powershell
-# From PowerShell:
-.\scripts\generate-encryption-key.ps1
-```
-
-All other scripts should be executed from WSL2 or Git Bash.
 
 ## Quick Start
 
@@ -69,24 +60,17 @@ The fastest way to get Smart Redact running:
 git clone https://github.com/pdf-tools/smart-redact-samples.git
 cd smart-redact-samples
 
-# 2. Create your .env file
-cp docker-compose/cpu/.env.example docker-compose/cpu/.env
+# 2. Create your .env file with generated secrets
+./smart-redact.sh setup --license-key "<your-license-key>"
 
-# 3. Fill in required values using the editor of your choice.
-#    - PII_SERVICE_LICENSE_KEY: your license key
-#    - ENCRYPTION_KEY: generate with ./scripts/generate-encryption-key.sh
-#    - ORCHESTRATOR_JWT_SECRET: generate with: openssl rand -base64 64 | tr -d '\n'
-vim docker-compose/cpu/.env
+# 3. Start all services and wait for Docker health checks
+./smart-redact.sh up
 
-# 4. Start all services
-cd docker-compose/cpu
-docker compose up -d
+# 4. Show Compose-managed service status
+./smart-redact.sh health
 
-# 5. Wait for services to be ready
-../../scripts/wait-for-services.sh
-
-# 6. Verify
-../../scripts/health-check.sh
+# Optional: stream logs
+./smart-redact.sh logs
 ```
 
 Once running:
