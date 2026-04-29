@@ -63,7 +63,7 @@ git clone https://github.com/pdf-tools/smart-redact-samples.git
 cd smart-redact-samples
 
 # 2. Create your .env file with generated secrets
-./smart-redact.sh setup --license-key "<your-license-key>"
+./smart-redact.sh setup --license-key "<RDCTSRV,...>"
 
 # 3. Start all services and wait for Docker health checks
 ./smart-redact.sh up

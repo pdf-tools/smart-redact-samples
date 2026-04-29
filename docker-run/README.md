@@ -8,7 +8,7 @@ Individual `docker run` scripts for each Smart Redact service. Use these when yo
 You can also use the root helper with the docker-run backend:
 
 ```bash
-../smart-redact.sh setup --backend docker-run --license-key "<your-license-key>"
+../smart-redact.sh setup --backend docker-run --license-key "<RDCTSRV,...>"
 ../smart-redact.sh up --backend docker-run
 ../smart-redact.sh health --backend docker-run
 ../smart-redact.sh logs --backend docker-run
@@ -23,7 +23,7 @@ You can also use the root helper with the docker-run backend:
 
 2. Set required environment variables:
    ```bash
-   export PII_SERVICE_LICENSE_KEY="<your-license-key>"
+   export PII_SERVICE_LICENSE_KEY="<RDCTSRV,...>"
    export ENCRYPTION_KEY=$(../scripts/generate-encryption-key.sh)
    export ORCHESTRATOR_JWT_SECRET=$(openssl rand -base64 64 | tr -d '\n')
    ```

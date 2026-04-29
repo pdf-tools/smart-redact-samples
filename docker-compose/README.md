@@ -9,7 +9,7 @@ Three Docker Compose configurations for different use cases.
 From this directory, use the root helper script:
 
 ```bash
-../smart-redact.sh setup --license-key "<your-license-key>"
+../smart-redact.sh setup --license-key "<RDCTSRV,...>"
 ../smart-redact.sh up
 ../smart-redact.sh health
 ```

@@ -45,7 +45,7 @@ Options:
   -h, --help                      Show this help
 
 Examples:
-  ./smart-redact.sh setup --license-key <key>
+  ./smart-redact.sh setup --license-key "<RDCTSRV,...>"
   ./smart-redact.sh up
   ./smart-redact.sh logs manager worker
   ./smart-redact.sh health

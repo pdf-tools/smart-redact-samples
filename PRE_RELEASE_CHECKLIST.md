@@ -44,7 +44,7 @@ Delete this file before publishing.
 
 ## Final verification (to be repeated close to release)
 
-- [ ] Clone the repo into a clean directory as if a first-time customer would, run `bash smart-redact.sh setup --license-key <fresh-license-key>`, and run `bash smart-redact.sh up` end-to-end.
+- [ ] Clone the repo into a clean directory as if a first-time customer would, run `bash smart-redact.sh setup --license-key "<RDCTSRV,...>"`, and run `bash smart-redact.sh up` end-to-end.
 - [ ] Run `bash smart-redact.sh up` and `bash smart-redact.sh health` for the Compose CPU quick start — both must pass.
 - [ ] Run `bash api-examples/curl/full-workflow.sh <some.pdf>` end-to-end against a pristine stack.
 - [ ] Run `python3 api-examples/python/full_workflow.py <some.pdf>` end-to-end.
