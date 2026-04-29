@@ -434,7 +434,19 @@ run_script() {
 
 wait_for_worker_container() {
   local start timeout status
-  timeout="${WORKER_HEALTH_TIMEOUT_SECONDS:-300}"
+  timeout="$TIMEOUT"
+  if [ -n "${WORKER_HEALTH_TIMEOUT_SECONDS:-}" ]; then
+    case "$WORKER_HEALTH_TIMEOUT_SECONDS" in
+      ''|*[!0-9]*|0)
+        die "WORKER_HEALTH_TIMEOUT_SECONDS must be a positive integer."
+        ;;
+      *)
+        if [ "$WORKER_HEALTH_TIMEOUT_SECONDS" -lt "$timeout" ]; then
+          timeout="$WORKER_HEALTH_TIMEOUT_SECONDS"
+        fi
+        ;;
+    esac
+  fi
   start="$(date +%s)"
   echo "Waiting for Worker to become healthy..."
   until docker inspect --format='{{.State.Health.Status}}' smart-redact-worker 2>/dev/null | grep -q healthy; do
