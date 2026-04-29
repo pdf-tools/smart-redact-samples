@@ -352,11 +352,17 @@ cmd_compose_health() {
 
 cmd_compose_logs() {
   local ids logs_pid
+  local services=()
+  local svc
 
-  if [ "${#LOG_SERVICES[@]}" -gt 0 ]; then
-    ids="$(run_compose ps -q "${LOG_SERVICES[@]}" 2>/dev/null || true)"
-    [ -n "$ids" ] || die "No running Compose containers found for: ${LOG_SERVICES[*]}"
-    run_compose logs -f --tail 200 "${LOG_SERVICES[@]}" &
+  for svc in "${LOG_SERVICES[@]}"; do
+    services+=("$(container_for_service "$svc")")
+  done
+
+  if [ "${#services[@]}" -gt 0 ]; then
+    ids="$(run_compose ps -q "${services[@]}" 2>/dev/null || true)"
+    [ -n "$ids" ] || die "No running Compose containers found for: ${services[*]}"
+    run_compose logs -f --tail 200 "${services[@]}" &
   else
     ids="$(run_compose ps -q 2>/dev/null || true)"
     [ -n "$ids" ] || die "No running Compose containers found. Run up first."
@@ -367,8 +373,8 @@ cmd_compose_logs() {
   trap 'kill "$logs_pid" 2>/dev/null || true' INT TERM EXIT
 
   while kill -0 "$logs_pid" 2>/dev/null; do
-    if [ "${#LOG_SERVICES[@]}" -gt 0 ]; then
-      ids="$(run_compose ps -q "${LOG_SERVICES[@]}" 2>/dev/null || true)"
+    if [ "${#services[@]}" -gt 0 ]; then
+      ids="$(run_compose ps -q "${services[@]}" 2>/dev/null || true)"
     else
       ids="$(run_compose ps -q 2>/dev/null || true)"
     fi
