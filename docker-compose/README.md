@@ -9,9 +9,9 @@ Three Docker Compose configurations for different use cases.
 The recommended entrypoint is the root helper script, run from the repository root:
 
 ```bash
-./smart-redact.sh setup --license-key "<your-license-key>" --variant cpu
-./smart-redact.sh up --variant cpu
-./smart-redact.sh health --variant cpu
+./smart-redact.sh setup --license-key "<your-license-key>"
+./smart-redact.sh up
+./smart-redact.sh health
 ```
 
 It creates the `.env` file, generates required secrets, and starts Compose with Docker's native health/wait support.
@@ -86,10 +86,10 @@ When the stack is exposed through a remote host or reverse proxy, set `HITL_ORCH
 
 ```bash
 # Show Compose-managed service status
-./smart-redact.sh status --variant cpu
+./smart-redact.sh status
 
 # Same Compose status view, kept as a familiar lifecycle command
-./smart-redact.sh health --variant cpu
+./smart-redact.sh health
 ```
 
 Open `http://localhost:3000` to use the HITL Web UI.
