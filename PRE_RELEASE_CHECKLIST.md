@@ -44,12 +44,12 @@ Delete this file before publishing.
 
 ## Final verification (to be repeated close to release)
 
-- [ ] Clone the repo into a clean directory as if a first-time customer would, fill in `.env` with a fresh license key, and run `docker compose -f docker-compose/cpu/docker-compose.yml up -d` end-to-end.
+- [ ] Clone the repo into a clean directory as if a first-time customer would, run `bash smart-redact.sh setup --license-key <fresh-license-key>`, and run `bash smart-redact.sh up` end-to-end.
 - [ ] Run `bash smart-redact.sh up` and `bash smart-redact.sh health` for the Compose CPU quick start — both must pass.
 - [ ] Run `bash api-examples/curl/full-workflow.sh <some.pdf>` end-to-end against a pristine stack.
 - [ ] Run `python3 api-examples/python/full_workflow.py <some.pdf>` end-to-end.
 - [ ] Run `dotnet run --project api-examples/csharp/ -- <some.pdf>` end-to-end.
-- [ ] Smoke-test the quick start on a Windows machine using Git Bash (or at minimum WSL2). Verify `scripts/generate-encryption-key.ps1` runs from PowerShell and produces a valid 32-byte base64 key.
+- [ ] Smoke-test the quick start on a Windows machine using Git Bash (or at minimum WSL2).
 
 ## Publishing
 

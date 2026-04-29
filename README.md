@@ -46,10 +46,12 @@ flowchart LR
 
 ## Windows Users
 
-All startup and API example scripts are bash-based. On Windows, use one of:
+The startup flow and API examples use bash. On Windows, use one of:
 
 - **WSL2** (recommended) — full Linux environment. Docker Desktop integrates with WSL2 natively, so `docker` commands just work.
 - **Git Bash** — bundled with [Git for Windows](https://git-scm.com/download/win). Sufficient for all Docker-based scripts in this repo, provided Docker Desktop is running and `python3` is available on `PATH` (needed by the curl API examples).
+
+A standalone PowerShell key-generation helper is also included for manual key generation; `smart-redact.sh setup` generates keys automatically.
 
 ## Quick Start
 

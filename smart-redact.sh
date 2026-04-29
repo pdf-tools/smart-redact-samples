@@ -180,13 +180,14 @@ require_compose_wait() {
     die "Your Docker Compose version does not support 'docker compose up --wait'. Please update Docker Compose."
 }
 
-compose_args() {
-  printf '%s\n' --env-file "$ENV_FILE" -f "$(compose_file)"
-}
-
 run_compose() {
   require_docker
-  docker compose --env-file "$ENV_FILE" -f "$(compose_file)" "$@"
+  local args=()
+  if [ -f "$ENV_FILE" ]; then
+    args+=(--env-file "$ENV_FILE")
+  fi
+  args+=(-f "$(compose_file)")
+  docker compose "${args[@]}" "$@"
 }
 
 prompt_license_key() {
@@ -196,10 +197,7 @@ prompt_license_key() {
 
   if [ -t 0 ]; then
     printf 'Smart Redact license key: ' >&2
-    stty -echo
     IFS= read -r LICENSE_KEY
-    stty echo
-    printf '\n' >&2
   else
     die "Pass --license-key when running setup non-interactively."
   fi
@@ -213,6 +211,50 @@ generate_secret_32() {
 
 generate_jwt_secret() {
   openssl rand -base64 64 | tr -d '\n'
+}
+
+env_file_get() {
+  local key="$1"
+  local default="${2:-}"
+  local value=""
+
+  if [ -f "$ENV_FILE" ]; then
+    value="$(
+      awk -v key="$key" '
+        /^[[:space:]]*(#|$)/ { next }
+        {
+          line = $0
+          sub(/^[[:space:]]*export[[:space:]]+/, "", line)
+          split(line, parts, "=")
+          current_key = parts[1]
+          gsub(/^[[:space:]]+|[[:space:]]+$/, "", current_key)
+          if (current_key != key) { next }
+          sub(/^[^=]*=/, "", line)
+          gsub(/^[[:space:]]+|[[:space:]]+$/, "", line)
+          if (line ~ /^".*"$/ || line ~ /^\047.*\047$/) {
+            line = substr(line, 2, length(line) - 2)
+          }
+          print line
+          exit
+        }
+      ' "$ENV_FILE"
+    )"
+  fi
+
+  if [ -n "$value" ]; then
+    printf '%s\n' "$value"
+  else
+    printf '%s\n' "$default"
+  fi
+}
+
+swagger_url_from_base() {
+  local url="${1%/}"
+  case "$url" in
+    */swagger) printf '%s\n' "$url" ;;
+    *://*/*) printf '%s\n' "$url" ;;
+    *) printf '%s/swagger\n' "$url" ;;
+  esac
 }
 
 write_env_file() {
@@ -277,17 +319,21 @@ cmd_compose_up() {
   ensure_env_exists
   require_compose_wait
   run_compose up -d --wait --wait-timeout "$TIMEOUT"
+
+  local hitl_web_port orchestrator_url
+
   echo ""
   echo "Services are ready."
   if [ "$VARIANT" != "minimal" ]; then
-    echo "  HITL Web UI:      http://localhost:3000"
-    echo "  Orchestrator API: http://localhost:9983/swagger"
+    hitl_web_port="$(env_file_get "HITL_WEB_PORT" "3000")"
+    orchestrator_url="$(env_file_get "HITL_ORCHESTRATOR_URL" "http://localhost:9983")"
+    echo "  HITL Web UI:      http://localhost:${hitl_web_port}"
+    echo "  Orchestrator API: $(swagger_url_from_base "$orchestrator_url")"
   fi
   echo "  Manager API:      http://localhost:9982/swagger"
 }
 
 cmd_compose_down() {
-  ensure_env_exists
   run_compose down
 }
 
@@ -297,17 +343,14 @@ cmd_compose_restart() {
 }
 
 cmd_compose_status() {
-  ensure_env_exists
   run_compose ps
 }
 
 cmd_compose_health() {
-  ensure_env_exists
   run_compose ps
 }
 
 cmd_compose_logs() {
-  ensure_env_exists
   local ids logs_pid
 
   if [ "${#LOG_SERVICES[@]}" -gt 0 ]; then
@@ -345,12 +388,10 @@ cmd_compose_logs() {
 }
 
 cmd_compose_pull() {
-  ensure_env_exists
   run_compose pull
 }
 
 cmd_compose_clean() {
-  ensure_env_exists
   if [ "$VOLUMES" -eq 1 ]; then
     run_compose down -v
   else
