@@ -46,7 +46,7 @@ services:
       FileStorage__FilesDirectoryPath: "/app/storage_folder"
       Encryption__EncryptionKey: "${ENCRYPTION_KEY}"
       Encryption__DekTokenTtlMinutes: 1440
-      Licensing__LicenseKey: "${PII_SERVICE_LICENSE_KEY}"
+      Licensing__LicenseKey: "${PDFTOOLS_LICENSE_KEY}"
     volumes:
       - storage:/app/storage_folder
       - logs:/app/logs
@@ -76,7 +76,7 @@ services:
     expose:
       - "4885"
     environment:
-      Licensing__LicenseKey: "${PII_SERVICE_LICENSE_KEY}"
+      Licensing__LicenseKey: "${PDFTOOLS_LICENSE_KEY}"
       Encryption__EncryptionKey: "${ENCRYPTION_KEY}"
       Encryption__DekTokenTtlMinutes: 1440
       FileStorage__FileStorageType: "HostFileSystem"
@@ -111,7 +111,7 @@ services:
       Database__DatabaseType: "PostgreSql"
       Database__ConnectionString: "User ID=smartredact;Password=smartredact;Server=smart-redact-orchestrator-db;Port=5432;Database=smartredact;Maximum Pool Size=50;Timeout=30;"
       Jwt__SecretKey: "${ORCHESTRATOR_JWT_SECRET}"
-      Licensing__LicenseKey: "${PII_SERVICE_LICENSE_KEY}"
+      Licensing__LicenseKey: "${PDFTOOLS_LICENSE_KEY}"
     volumes:
       - logs:/app/logs
     networks:

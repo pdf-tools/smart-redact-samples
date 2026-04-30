@@ -24,7 +24,7 @@ Environment variables:
     SMART_REDACT_JOB_TIMEOUT_SECONDS   - Timeout for synchronous detection/redaction
                                          requests (default: 3600)
 
-See SMART_REDACT_DOCS_URL for full API documentation.
+See https://www.pdf-tools.com/docs/smart-redact for full API documentation.
 """
 
 import argparse

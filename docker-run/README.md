@@ -13,7 +13,7 @@ Individual `docker run` scripts for each Smart Redact service. Use these when yo
 
 2. Set required environment variables:
    ```bash
-   export PII_SERVICE_LICENSE_KEY="<your-license-key>"
+   export PDFTOOLS_LICENSE_KEY="<your-license-key>"
    export ENCRYPTION_KEY=$(../scripts/generate-encryption-key.sh)
    export ORCHESTRATOR_JWT_SECRET=$(openssl rand -base64 64 | tr -d '\n')
    ```
