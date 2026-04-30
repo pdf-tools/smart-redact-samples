@@ -12,6 +12,7 @@ ENV_FILE=""
 LICENSE_KEY=""
 FORCE=0
 VOLUMES=0
+IMAGES=0
 TIMEOUT=300
 LOG_SERVICES=()
 LOG_SERVICE_COUNT=0
@@ -32,7 +33,7 @@ Commands:
   health      Show health/status
   logs        Stream logs (optional service names)
   pull        Pull Docker images
-  clean       Stop and remove containers; add --volumes to delete data
+  clean       Stop and remove containers; add --volumes/--images/--all to delete data and images
   help        Show this help
 
 Options:
@@ -42,6 +43,8 @@ Options:
   --license-key KEY               Smart Redact license key for setup
   --force                         Overwrite existing env file during setup
   --volumes                       Delete persisted Docker volumes during clean
+  --images                        Delete Smart Redact Docker images during clean
+  --all                           Shorthand for --volumes --images
   --timeout SECONDS               Compose up --wait timeout (default: 300)
   -h, --help                      Show this help
 
@@ -51,6 +54,7 @@ Examples:
   ./smart-redact.sh logs manager worker
   ./smart-redact.sh health
   ./smart-redact.sh clean --volumes
+  ./smart-redact.sh clean --all
 USAGE
 }
 
@@ -100,6 +104,15 @@ while [ "$#" -gt 0 ]; do
       ;;
     --volumes)
       VOLUMES=1
+      shift
+      ;;
+    --images)
+      IMAGES=1
+      shift
+      ;;
+    --all)
+      VOLUMES=1
+      IMAGES=1
       shift
       ;;
     --timeout)
@@ -276,7 +289,7 @@ write_env_file() {
     echo '# ============================================================================='
     echo '# This file contains secrets. Do not commit it.'
     echo ''
-    echo "PII_SERVICE_LICENSE_KEY=${LICENSE_KEY}"
+    echo "PDFTOOLS_LICENSE_KEY=${LICENSE_KEY}"
     echo "ENCRYPTION_KEY=${encryption_key}"
     if [ "$VARIANT" != "minimal" ]; then
       jwt_secret="$(generate_jwt_secret)"
@@ -398,11 +411,42 @@ cmd_compose_pull() {
   run_compose pull
 }
 
-cmd_compose_clean() {
-  if [ "$VOLUMES" -eq 1 ]; then
-    run_compose down -v
+remove_smart_redact_images() {
+  require_docker
+  local repo image images count=0
+  for repo in \
+    pdftoolsag/smart-redact-manager \
+    pdftoolsag/smart-redact-worker \
+    pdftoolsag/smart-redact-orchestrator \
+    pdftoolsag/smart-redact-hitl-web; do
+    images="$(docker images --format '{{.Repository}}:{{.Tag}}' | grep "^${repo}:" || true)"
+    [ -n "$images" ] || continue
+    while IFS= read -r image; do
+      [ -n "$image" ] || continue
+      if docker rmi -f "$image" >/dev/null; then
+        echo "  Removed: $image"
+        count=$((count + 1))
+      else
+        echo "  Failed to remove: $image" >&2
+      fi
+    done <<< "$images"
+  done
+  if [ "$count" -eq 0 ]; then
+    echo "  No Smart Redact images found."
   else
-    run_compose down
+    echo "  Removed ${count} image(s)."
+  fi
+}
+
+cmd_compose_clean() {
+  local args=(down)
+  [ "$VOLUMES" -eq 1 ] && args+=(-v)
+  run_compose "${args[@]}"
+
+  if [ "$IMAGES" -eq 1 ]; then
+    echo ""
+    echo "Removing Smart Redact images..."
+    remove_smart_redact_images
   fi
 }
 
@@ -422,7 +466,7 @@ load_env_file() {
     value="${value%\'}"
     value="${value#\'}"
     case "$key" in
-      PII_SERVICE_LICENSE_KEY|ENCRYPTION_KEY|ORCHESTRATOR_JWT_SECRET|VERSION|HITL_WEB_PORT|HITL_ORCHESTRATOR_URL)
+      PDFTOOLS_LICENSE_KEY|ENCRYPTION_KEY|ORCHESTRATOR_JWT_SECRET|VERSION|HITL_WEB_PORT|HITL_ORCHESTRATOR_URL)
         export "${key}=${value}"
         ;;
     esac
@@ -430,7 +474,9 @@ load_env_file() {
 }
 
 run_script() {
-  "${SCRIPT_DIR}/docker-run/$1"
+  local script="$1"
+  shift
+  "${SCRIPT_DIR}/docker-run/${script}" "$@"
 }
 
 wait_for_worker_container() {
@@ -564,8 +610,12 @@ cmd_docker_run_pull() {
 
 cmd_docker_run_clean() {
   require_docker
-  if [ "$VOLUMES" -eq 1 ]; then
-    run_script cleanup.sh --all
+  if [ "$VOLUMES" -eq 1 ] && [ "$IMAGES" -eq 1 ]; then
+    run_script cleanup.sh --volumes --images
+  elif [ "$VOLUMES" -eq 1 ]; then
+    run_script cleanup.sh --volumes
+  elif [ "$IMAGES" -eq 1 ]; then
+    run_script cleanup.sh --images
   else
     run_script cleanup.sh
   fi

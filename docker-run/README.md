@@ -74,8 +74,10 @@ docker rm smart-redact-manager smart-redact-worker smart-redact-orchestrator sma
 
 Or use the cleanup script (covers docker-run naming only):
 ```bash
-./cleanup.sh          # remove containers + network (keep volumes)
-./cleanup.sh --all    # also remove volumes (DELETES ALL DATA)
+./cleanup.sh                  # remove containers + network (keep volumes and images)
+./cleanup.sh --volumes        # also remove volumes (DELETES ALL DATA)
+./cleanup.sh --images         # also remove Smart Redact images
+./cleanup.sh --all            # remove volumes AND Smart Redact images (shorthand)
 ```
 
 > For Docker Compose deployments, use `docker compose down` (optionally `-v`) instead.

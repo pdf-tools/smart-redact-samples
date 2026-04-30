@@ -81,7 +81,7 @@ Once running:
 - **HITL Web UI:** http://localhost:3000
 
 Default HITL / Orchestrator login:
-- **Username:** `admin`
+- **Email:** `admin@example.com`
 - **Password:** `Admin1234`
 
 ## Repository Structure

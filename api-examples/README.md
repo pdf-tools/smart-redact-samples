@@ -56,7 +56,7 @@ For asynchronous jobs:
 
 If you're using the Orchestrator (web UI backend), it has its own API with authentication:
 
-- **Default credentials:** `admin` / `Admin1234` (password reset required on first login)
+- **Default credentials:** `admin@example.com` / `Admin1234` (password reset required on first login)
 - **Swagger UI:** http://localhost:9983/swagger
 
 > See [Orchestrator Authentication Guide](https://www.pdf-tools.com/docs/smart-redact/authentication) for details.
