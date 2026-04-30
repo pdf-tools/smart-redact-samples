@@ -16,7 +16,7 @@
 /// Environment variables:
 ///     MANAGER_URL  - Smart Redact Manager base URL (default: http://localhost:9982)
 ///
-/// See SMART_REDACT_DOCS_URL for full API documentation.
+/// See https://www.pdf-tools.com/docs/smart-redact for full API documentation.
 /// </summary>
 
 using System.Net;

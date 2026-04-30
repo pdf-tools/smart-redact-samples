@@ -1,6 +1,6 @@
 # Pdftools Smart Redact - Samples Repository
 
-Sample configurations and examples for deploying and using [Smart Redact](SMART_REDACT_DOCS_URL) by Pdftools.
+Sample configurations and examples for deploying and using [Smart Redact](https://www.pdf-tools.com/docs/smart-redact) by Pdftools.
 
 Smart Redact automatically detects and redacts personally identifiable information (PII) in PDF documents using pattern matching, keyword detection, and ML-based named entity recognition (GLiNER).
 
@@ -35,12 +35,12 @@ flowchart LR
 | **Orchestrator** | 9983 | Web UI backend with user management and JWT authentication |
 | **HITL Web UI** | 3000 | Human-in-the-loop review interface for detection results and redaction jobs |
 
-> For detailed architecture documentation, see [Smart Redact Architecture](SMART_REDACT_DOCS_URL/architecture).
+> For detailed architecture documentation, see [Smart Redact Architecture](https://www.pdf-tools.com/docs/smart-redact/architecture).
 
 ## Prerequisites
 
 - [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) v2+
-- A valid Smart Redact license key ([get one here](SMART_REDACT_DOCS_URL/licensing))
+- A valid Smart Redact license key ([get one here](https://www.pdf-tools.com/docs/smart-redact/licensing))
 - Docker Hub access to the `pdftoolsag` images. If the images are private, run `docker login` before `docker compose up` or `docker run`.
 - For GPU acceleration: NVIDIA GPU with [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html)
 
@@ -73,7 +73,7 @@ cd smart-redact-samples
 cp docker-compose/cpu/.env.example docker-compose/cpu/.env
 
 # 3. Fill in required values using the editor of your choice.
-#    - PII_SERVICE_LICENSE_KEY: your license key
+#    - PDFTOOLS_LICENSE_KEY: your license key
 #    - ENCRYPTION_KEY: generate with ./scripts/generate-encryption-key.sh
 #    - ORCHESTRATOR_JWT_SECRET: generate with: openssl rand -base64 64 | tr -d '\n'
 vim docker-compose/cpu/.env
@@ -135,7 +135,7 @@ See [api-examples/](api-examples/) for complete usage examples including:
 - Running PII redaction
 - End-to-end workflows
 
-> For full API reference, see [Smart Redact API Documentation](SMART_REDACT_DOCS_URL/api-reference).
+> For full API reference, see [Smart Redact API Documentation](https://www.pdf-tools.com/docs/smart-redact/api-reference).
 
 ## Configuration Reference
 
@@ -143,22 +143,22 @@ All Smart Redact services are configured via environment variables:
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `PII_SERVICE_LICENSE_KEY` | Yes | Smart Redact license key |
+| `PDFTOOLS_LICENSE_KEY` | Yes | Smart Redact license key |
 | `ENCRYPTION_KEY` | Yes | 32-byte Base64-encoded AES-256-GCM key |
 | `ORCHESTRATOR_JWT_SECRET` | Yes* | JWT signing secret (min 32 chars). *Only for Orchestrator. |
 | `VERSION` | No | Docker image tag (default: `latest`) |
 | `HITL_WEB_PORT` | No | Host port for the HITL Web UI (default: `3000`) |
 | `HITL_ORCHESTRATOR_URL` | No | Browser-facing Orchestrator API URL used by the HITL Web UI (default: `http://localhost:9983`) |
 
-> For all configuration options, see [Smart Redact Configuration Guide](SMART_REDACT_DOCS_URL/configuration).
+> For all configuration options, see [Smart Redact Configuration Guide](https://www.pdf-tools.com/docs/smart-redact/configuration).
 
 ## Documentation
 
-- [Smart Redact Documentation](SMART_REDACT_DOCS_URL)
-- [Configuration Guide](SMART_REDACT_DOCS_URL/configuration)
-- [API Reference](SMART_REDACT_DOCS_URL/api-reference)
-- [Architecture](SMART_REDACT_DOCS_URL/architecture)
-- [Licensing](SMART_REDACT_DOCS_URL/licensing)
+- [Smart Redact Documentation](https://www.pdf-tools.com/docs/smart-redact)
+- [Configuration Guide](https://www.pdf-tools.com/docs/smart-redact/configuration)
+- [API Reference](https://www.pdf-tools.com/docs/smart-redact/api-reference)
+- [Architecture](https://www.pdf-tools.com/docs/smart-redact/architecture)
+- [Licensing](https://www.pdf-tools.com/docs/smart-redact/licensing)
 
 ## License
 

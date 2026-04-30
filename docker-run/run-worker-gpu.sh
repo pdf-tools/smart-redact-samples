@@ -8,7 +8,7 @@
 # =============================================================================
 set -euo pipefail
 
-: "${PII_SERVICE_LICENSE_KEY:?Error: PII_SERVICE_LICENSE_KEY is not set}"
+: "${PDFTOOLS_LICENSE_KEY:?Error: PDFTOOLS_LICENSE_KEY is not set}"
 : "${ENCRYPTION_KEY:?Error: ENCRYPTION_KEY is not set}"
 
 VERSION="${VERSION:-latest}"
@@ -23,7 +23,7 @@ docker run -d \
   --network "$NETWORK" \
   --restart unless-stopped \
   --gpus all \
-  -e "Licensing__LicenseKey=${PII_SERVICE_LICENSE_KEY}" \
+  -e "Licensing__LicenseKey=${PDFTOOLS_LICENSE_KEY}" \
   -e "Encryption__EncryptionKey=${ENCRYPTION_KEY}" \
   -e "Encryption__DekTokenTtlMinutes=1440" \
   -e "FileStorage__FileStorageType=HostFileSystem" \

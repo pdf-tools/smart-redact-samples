@@ -4,7 +4,7 @@
 # =============================================================================
 set -euo pipefail
 
-: "${PII_SERVICE_LICENSE_KEY:?Error: PII_SERVICE_LICENSE_KEY is not set}"
+: "${PDFTOOLS_LICENSE_KEY:?Error: PDFTOOLS_LICENSE_KEY is not set}"
 : "${ENCRYPTION_KEY:?Error: ENCRYPTION_KEY is not set}"
 
 VERSION="${VERSION:-latest}"
@@ -26,7 +26,7 @@ docker run -d \
   -e "FileStorage__FilesDirectoryPath=/app/storage_folder" \
   -e "Encryption__EncryptionKey=${ENCRYPTION_KEY}" \
   -e "Encryption__DekTokenTtlMinutes=1440" \
-  -e "Licensing__LicenseKey=${PII_SERVICE_LICENSE_KEY}" \
+  -e "Licensing__LicenseKey=${PDFTOOLS_LICENSE_KEY}" \
   -v smart-redact-storage:/app/storage_folder \
   -v smart-redact-logs:/app/logs \
   --health-cmd "curl -f http://localhost:9982/healthz/ready || exit 1" \

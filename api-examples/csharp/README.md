@@ -40,4 +40,4 @@ MANAGER_URL=http://smartredact.example.com:9982 dotnet run -- input.pdf
 
 ## API Reference
 
-For full API documentation, see the [Smart Redact API Reference](SMART_REDACT_DOCS_URL/api-reference).
+For full API documentation, see the [Smart Redact API Reference](https://www.pdf-tools.com/docs/smart-redact/api-reference).
