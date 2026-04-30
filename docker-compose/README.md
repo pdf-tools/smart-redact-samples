@@ -6,6 +6,16 @@ Three Docker Compose configurations for different use cases.
 
 ## Variants
 
+From this directory, use the root helper script:
+
+```bash
+../smart-redact.sh setup --license-key "<RDCTSRV,...>"
+../smart-redact.sh up
+../smart-redact.sh health
+```
+
+It creates the `.env` file, generates required secrets, and starts Compose with Docker's native health/wait support.
+
 ### CPU (Full Stack)
 
 All services with CPU-based inference. Best for evaluation, development, and environments without a GPU.
@@ -14,7 +24,7 @@ All services with CPU-based inference. Best for evaluation, development, and env
 cd cpu
 cp .env.example .env
 # Edit .env with your license key and generated secrets
-docker compose up -d
+docker compose up -d --wait
 ```
 
 **Services started:** Manager (9982), Worker (4885), Orchestrator (9983), HITL Web UI (3000), 2x PostgreSQL
@@ -31,7 +41,7 @@ All services with GPU-accelerated inference using NVIDIA CUDA. Best for producti
 cd gpu
 cp .env.example .env
 # Edit .env with your license key and generated secrets
-docker compose up -d
+docker compose up -d --wait
 ```
 
 **Services started:** Manager (9982), Worker/GPU (4885), Orchestrator (9983), HITL Web UI (3000), 2x PostgreSQL
@@ -44,7 +54,7 @@ Manager and Worker only, without the Orchestrator or HITL Web UI. Use this if yo
 cd minimal
 cp .env.example .env
 # Edit .env with your license key and generated secrets
-docker compose up -d
+docker compose up -d --wait
 ```
 
 **Services started:** Manager (9982), Worker (4885), 1x PostgreSQL
@@ -75,22 +85,17 @@ When the stack is exposed through a remote host or reverse proxy, set `HITL_ORCH
 ## Verifying the Deployment
 
 ```bash
-# Full stack (Manager + Worker + Orchestrator + HITL Web UI)
-../../scripts/health-check.sh
+# Show Compose-managed service status
+../smart-redact.sh status
 
-# Minimal stack (Manager + internal Worker, no Orchestrator, no HITL)
-CHECK_ORCHESTRATOR=0 CHECK_HITL=0 ../../scripts/health-check.sh
-
-# Or check individually
-curl -s http://localhost:9982/healthz/ready    # Manager
-curl -s http://localhost:9983/healthz/ready    # Orchestrator
-curl -s http://localhost:3000/                 # HITL Web UI
+# Same Compose status view, kept as a familiar lifecycle command
+../smart-redact.sh health
 ```
 
 Open `http://localhost:3000` to use the HITL Web UI.
 
 The Worker API is internal-only in the provided Docker Compose files.
-`health-check.sh` verifies the Worker via Docker container health by default, and only uses `WORKER_URL` directly if you intentionally expose port `4885`.
+Compose readiness is driven by service `healthcheck` and `depends_on` conditions, including the internal Worker health check.
 
 ## Stopping Services
 
