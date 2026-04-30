@@ -3,6 +3,16 @@
 Individual `docker run` scripts for each Smart Redact service. Use these when you need full control over each container, or when Docker Compose is not available.
 
 > For most use cases, [Docker Compose](../docker-compose/) is the easier option.
+> Docker Compose uses native `healthcheck` and `docker compose up --wait`; the custom wait/health scripts live here because plain `docker run` does not provide the same orchestration.
+
+You can also use the root helper with the docker-run backend:
+
+```bash
+../smart-redact.sh setup --backend docker-run --license-key "<RDCTSRV,...>"
+../smart-redact.sh up --backend docker-run
+../smart-redact.sh health --backend docker-run
+../smart-redact.sh logs --backend docker-run
+```
 
 ## Prerequisites
 
@@ -13,7 +23,7 @@ Individual `docker run` scripts for each Smart Redact service. Use these when yo
 
 2. Set required environment variables:
    ```bash
-   export PDFTOOLS_LICENSE_KEY="<your-license-key>"
+   export PDFTOOLS_LICENSE_KEY="<RDCTSRV,...>"
    export ENCRYPTION_KEY=$(../scripts/generate-encryption-key.sh)
    export ORCHESTRATOR_JWT_SECRET=$(openssl rand -base64 64 | tr -d '\n')
    ```
@@ -69,3 +79,14 @@ Or use the cleanup script (covers docker-run naming only):
 ```
 
 > For Docker Compose deployments, use `docker compose down` (optionally `-v`) instead.
+
+## Wait and Health Helpers
+
+The docker-run backend includes custom helpers for readiness checks:
+
+```bash
+./wait-for-services.sh
+./health-check.sh
+```
+
+These scripts check host-reachable HTTP endpoints and internal Worker container health. They are intentionally scoped to `docker-run`; Compose deployments should use `docker compose up --wait` and `../smart-redact.sh health`.

@@ -5,7 +5,7 @@
 #
 # Usage:
 #   cp .env.example .env    # fill in required values
-#   docker compose up -d
+#   docker compose up -d --wait
 #
 # Services:
 #   - Manager API:      http://localhost:9982  (Swagger: http://localhost:9982/swagger)
