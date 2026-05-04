@@ -40,7 +40,7 @@ Delete this file before publishing.
 - [x] Add a top-level `LICENSE` file. Recommendation: **MIT** (standard for vendor sample repos, most permissive, widest downstream use). Apache-2.0 if an explicit patent grant is required. Confirm with Legal.
 - [x] Confirm that publishing these sample configurations as open source is approved (contracts, product, legal).
 - [x] Confirm trademark usage of `PDF Tools` / `Smart Redact` in the README metadata.
-- [ ] Add `SECURITY.md` with instructions for reporting security vulnerabilities (private disclosure address, expected response time).
+- [x] Add `SECURITY.md` with instructions for reporting security vulnerabilities (private disclosure address, expected response time).
 
 ## Final verification (to be repeated close to release)
 
