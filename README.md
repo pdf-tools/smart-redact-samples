@@ -28,12 +28,12 @@ flowchart LR
     Manager --- ManagerDB
 ```
 
-| Service | Port | Description |
-|---------|------|-------------|
-| **Manager** | 9982 | Client-facing API for file uploads and detection/redaction jobs |
-| **Worker** | 4885 | Internal service that performs PII detection and redaction |
-| **Orchestrator** | 9983 | Web UI backend with user management and JWT authentication |
-| **HITL Web UI** | 3000 | Human-in-the-loop review interface for detection results and redaction jobs |
+| Service          | Port | Description                                                                 |
+| ---------------- | ---- | --------------------------------------------------------------------------- |
+| **HITL Web UI**  | 3000 | Human-in-the-loop review interface for detection results and redaction jobs |
+| **Orchestrator** | 9983 | Web UI backend with user management and JWT authentication                  |
+| **Manager**      | 9982 | Client-facing API for file uploads and detection/redaction jobs             |
+| **Worker**       | 4885 | Internal service that performs PII detection and redaction                  |
 
 > For detailed architecture documentation, see [Smart Redact Architecture](https://www.pdf-tools.com/docs/smart-redact/architecture).
 
@@ -76,13 +76,16 @@ cd smart-redact-samples
 ```
 
 Once running:
+
+- **HITL Web UI:** http://localhost:3000
 - **Manager API (Swagger):** http://localhost:9982/swagger
 - **Orchestrator API (Swagger):** http://localhost:9983/swagger
-- **HITL Web UI:** http://localhost:3000
+
 
 Default HITL / Orchestrator login:
+
 - **Email:** `admin@example.com`
-- **Password:** `Admin1234`
+- **Password:** `Admin@1234!Tmp`
 
 ## Repository Structure
 
@@ -105,16 +108,17 @@ smart-redact-samples/
 
 ## Deployment Options
 
-| Option | Best For | Guide |
-|--------|----------|-------|
-| [Docker Compose (CPU)](docker-compose/cpu/) | Quick start, development, evaluation | [Guide](docker-compose/README.md) |
-| [Docker Compose (GPU)](docker-compose/gpu/) | Production with GPU acceleration | [Guide](docker-compose/README.md) |
-| [Docker Compose (Minimal)](docker-compose/minimal/) | API-only usage without Orchestrator | [Guide](docker-compose/README.md) |
-| [Docker Run](docker-run/) | Manual control over each container | [Guide](docker-run/README.md) |
+| Option                                              | Best For                             | Guide                             |
+| --------------------------------------------------- | ------------------------------------ | --------------------------------- |
+| [Docker Compose (CPU)](docker-compose/cpu/)         | Quick start, development, evaluation | [Guide](docker-compose/README.md) |
+| [Docker Compose (GPU)](docker-compose/gpu/)         | Production with GPU acceleration     | [Guide](docker-compose/README.md) |
+| [Docker Compose (Minimal)](docker-compose/minimal/) | API-only usage without Orchestrator  | [Guide](docker-compose/README.md) |
+| [Docker Run](docker-run/)                           | Manual control over each container   | [Guide](docker-run/README.md)     |
 
 ## API Examples
 
 See [api-examples/](api-examples/) for complete usage examples including:
+
 - Uploading PDF files
 - Running PII detection
 - Downloading detection results
@@ -127,14 +131,14 @@ See [api-examples/](api-examples/) for complete usage examples including:
 
 All Smart Redact services are configured via environment variables:
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `PDFTOOLS_LICENSE_KEY` | Yes | Smart Redact license key |
-| `ENCRYPTION_KEY` | Yes | 32-byte Base64-encoded AES-256-GCM key |
-| `ORCHESTRATOR_JWT_SECRET` | Yes* | JWT signing secret (min 32 chars). *Only for Orchestrator. |
-| `VERSION` | No | Docker image tag (default: `latest`) |
-| `HITL_WEB_PORT` | No | Host port for the HITL Web UI (default: `3000`) |
-| `HITL_ORCHESTRATOR_URL` | No | Browser-facing Orchestrator API URL used by the HITL Web UI (default: `http://localhost:9983`) |
+| Variable                  | Required | Description                                                                                    |
+| ------------------------- | -------- | ---------------------------------------------------------------------------------------------- |
+| `PDFTOOLS_LICENSE_KEY`    | Yes      | Smart Redact license key                                                                       |
+| `ENCRYPTION_KEY`          | Yes      | 32-byte Base64-encoded AES-256-GCM key                                                         |
+| `ORCHESTRATOR_JWT_SECRET` | Yes\*    | JWT signing secret (min 32 chars). \*Only for Orchestrator.                                    |
+| `VERSION`                 | No       | Docker image tag (default: `latest`)                                                           |
+| `HITL_WEB_PORT`           | No       | Host port for the HITL Web UI (default: `3000`)                                                |
+| `HITL_ORCHESTRATOR_URL`   | No       | Browser-facing Orchestrator API URL used by the HITL Web UI (default: `http://localhost:9983`) |
 
 > For all configuration options, see [Smart Redact Configuration Guide](https://www.pdf-tools.com/docs/smart-redact/configuration).
 

@@ -6,12 +6,12 @@ Delete this file before publishing.
 ## Docker image references
 
 - [x] Final public Docker Hub image names confirmed as `pdftoolsag/smart-redact-manager`, `pdftoolsag/smart-redact-worker`, `pdftoolsag/smart-redact-worker:*-cuda`, `pdftoolsag/smart-redact-orchestrator` — no rename needed.
-- [ ] Publish the three images to Docker Hub as public (Manager, Worker CPU + CUDA, Orchestrator).
-- [ ] Smoke-test `docker pull` of each final image tag from a machine that is not logged in to any registry.
+- [x] Publish the three images to Docker Hub as public (Manager, Worker CPU + CUDA, Orchestrator).
+- [x] Smoke-test `docker pull` of each final image tag from a machine that is not logged in to any registry.
 
 ## Documentation placeholders
 
-- [ ] Replace all `https://www.pdf-tools.com/docs/smart-redact` occurrences with the final public documentation base URL. Affected:
+- [x] Replace all `https://www.pdf-tools.com/docs/smart-redact` occurrences with the final public documentation base URL. Affected:
   - `README.md`
   - `.env.example`
   - `api-examples/README.md`, `api-examples/csharp/README.md`, `api-examples/csharp/Program.cs`
@@ -37,10 +37,10 @@ Delete this file before publishing.
 
 ## Licensing and policies
 
-- [ ] Add a top-level `LICENSE` file. Recommendation: **MIT** (standard for vendor sample repos, most permissive, widest downstream use). Apache-2.0 if an explicit patent grant is required. Confirm with Legal.
+- [x] Add a top-level `LICENSE` file. Recommendation: **MIT** (standard for vendor sample repos, most permissive, widest downstream use). Apache-2.0 if an explicit patent grant is required. Confirm with Legal.
+- [x] Confirm that publishing these sample configurations as open source is approved (contracts, product, legal).
+- [x] Confirm trademark usage of `PDF Tools` / `Smart Redact` in the README metadata.
 - [ ] Add `SECURITY.md` with instructions for reporting security vulnerabilities (private disclosure address, expected response time).
-- [ ] Confirm that publishing these sample configurations as open source is approved (contracts, product, legal).
-- [ ] Confirm trademark usage of `PDF Tools` / `Smart Redact` in the README metadata.
 
 ## Final verification (to be repeated close to release)
 
@@ -53,10 +53,8 @@ Delete this file before publishing.
 
 ## Publishing
 
-- [ ] Create the public GitHub repository at `https://github.com/pdf-tools/smart-redact-samples` (kept private until launch).
+- [x] Create the public GitHub repository at `https://github.com/pdf-tools/smart-redact-samples` (kept private until launch).
+- [x] Configure GitHub repo description, topics, and website link (documentation URL).
+- [x] Update the product landing page / marketing site to link to this repo once it is public.
 - [ ] Push the cleaned history.
-- [ ] Enable branch protection on `main` (required reviews, no force push, signed commits if org policy).
-- [ ] Configure GitHub repo description, topics, and website link (documentation URL).
-- [ ] Add `CODEOWNERS` if internal review routing is desired.
-- [ ] Update the product landing page / marketing site to link to this repo once it is public.
 - [ ] Delete this `PRE_RELEASE_CHECKLIST.md` file in the same PR that flips the repo to public.

@@ -6,11 +6,11 @@ Usage examples for the Smart Redact Manager API.
 
 ## Available Examples
 
-| Language | Directory | Description |
-|----------|-----------|-------------|
-| **curl** | [curl/](curl/) | Shell scripts for each API step |
-| **C#** | [csharp/](csharp/) | .NET console app using `HttpClient` |
-| **Python** | [python/](python/) | Python scripts using `requests` |
+| Language   | Directory          | Description                         |
+| ---------- | ------------------ | ----------------------------------- |
+| **curl**   | [curl/](curl/)     | Shell scripts for each API step     |
+| **C#**     | [csharp/](csharp/) | .NET console app using `HttpClient` |
+| **Python** | [python/](python/) | Python scripts using `requests`     |
 
 ## Typical Workflow
 
@@ -37,18 +37,18 @@ For asynchronous jobs:
 
 **Manager API** (default: http://localhost:9982):
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/v1/files/upload/fromLocal` | Upload a PDF file |
-| `POST` | `/v1/files/upload/fromUrl` | Upload a PDF from URL |
-| `GET` | `/v1/files` | List uploaded files |
-| `GET` | `/v1/files/{fileId}` | Get file metadata |
-| `POST` | `/v1/files/download` | Download a file |
-| `DELETE` | `/v1/files/{fileId}` | Delete a file |
-| `POST` | `/v1/jobs/SIDetection` | Start a detection job |
-| `GET` | `/v1/jobs/SIDetection/{jobId}/result` | Get detection result |
-| `POST` | `/v1/jobs/SIRedaction` | Start a redaction job |
-| `GET` | `/v1/jobs/SIRedaction/{jobId}/result` | Get redaction result |
+| Method   | Endpoint                              | Description           |
+| -------- | ------------------------------------- | --------------------- |
+| `POST`   | `/v1/files/upload/fromLocal`          | Upload a PDF file     |
+| `POST`   | `/v1/files/upload/fromUrl`            | Upload a PDF from URL |
+| `GET`    | `/v1/files`                           | List uploaded files   |
+| `GET`    | `/v1/files/{fileId}`                  | Get file metadata     |
+| `POST`   | `/v1/files/download`                  | Download a file       |
+| `DELETE` | `/v1/files/{fileId}`                  | Delete a file         |
+| `POST`   | `/v1/jobs/SIDetection`                | Start a detection job |
+| `GET`    | `/v1/jobs/SIDetection/{jobId}/result` | Get detection result  |
+| `POST`   | `/v1/jobs/SIRedaction`                | Start a redaction job |
+| `GET`    | `/v1/jobs/SIRedaction/{jobId}/result` | Get redaction result  |
 
 **Swagger UI:** http://localhost:9982/swagger
 
@@ -56,7 +56,7 @@ For asynchronous jobs:
 
 If you're using the Orchestrator (web UI backend), it has its own API with authentication:
 
-- **Default credentials:** `admin@example.com` / `Admin1234` (password reset required on first login)
+- **Default credentials:** `admin@example.com` / `Admin@1234!Tmp` (password reset required on first login)
 - **Swagger UI:** http://localhost:9983/swagger
 
 > See [Orchestrator Authentication Guide](https://www.pdf-tools.com/docs/smart-redact/authentication) for details.
