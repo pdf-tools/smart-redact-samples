@@ -6,7 +6,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-: "${PII_SERVICE_LICENSE_KEY:?Error: PII_SERVICE_LICENSE_KEY is not set}"
+: "${PDFTOOLS_LICENSE_KEY:?Error: PDFTOOLS_LICENSE_KEY is not set}"
 : "${ENCRYPTION_KEY:?Error: ENCRYPTION_KEY is not set}"
 : "${ORCHESTRATOR_JWT_SECRET:?Error: ORCHESTRATOR_JWT_SECRET is not set}"
 
@@ -60,4 +60,4 @@ echo "  Manager API:      http://localhost:9982/swagger"
 echo "  Orchestrator API: http://localhost:9983/swagger"
 echo "  HITL Web UI:      http://localhost:${HITL_WEB_PORT:-3000}"
 echo ""
-echo "Default HITL / Orchestrator login: admin / Admin1234"
+echo "Default HITL / Orchestrator login: admin@example.com / Admin1234"

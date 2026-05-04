@@ -11,7 +11,7 @@ Delete this file before publishing.
 
 ## Documentation placeholders
 
-- [ ] Replace all `SMART_REDACT_DOCS_URL` occurrences with the final public documentation base URL. Affected:
+- [ ] Replace all `https://www.pdf-tools.com/docs/smart-redact` occurrences with the final public documentation base URL. Affected:
   - `README.md`
   - `.env.example`
   - `api-examples/README.md`, `api-examples/csharp/README.md`, `api-examples/csharp/Program.cs`

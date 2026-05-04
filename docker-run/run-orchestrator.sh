@@ -4,7 +4,7 @@
 # =============================================================================
 set -euo pipefail
 
-: "${PII_SERVICE_LICENSE_KEY:?Error: PII_SERVICE_LICENSE_KEY is not set}"
+: "${PDFTOOLS_LICENSE_KEY:?Error: PDFTOOLS_LICENSE_KEY is not set}"
 : "${ORCHESTRATOR_JWT_SECRET:?Error: ORCHESTRATOR_JWT_SECRET is not set}"
 
 VERSION="${VERSION:-latest}"
@@ -24,7 +24,7 @@ docker run -d \
   -e "Database__DatabaseType=PostgreSql" \
   -e "Database__ConnectionString=User ID=smartredact;Password=smartredact;Server=smart-redact-orchestrator-db;Port=5432;Database=smartredact;Maximum Pool Size=50;Timeout=30;" \
   -e "Jwt__SecretKey=${ORCHESTRATOR_JWT_SECRET}" \
-  -e "Licensing__LicenseKey=${PII_SERVICE_LICENSE_KEY}" \
+  -e "Licensing__LicenseKey=${PDFTOOLS_LICENSE_KEY}" \
   -v smart-redact-logs:/app/logs \
   --health-cmd "curl -f http://localhost:9983/healthz/ready || exit 1" \
   --health-interval 10s \
@@ -36,4 +36,4 @@ docker run -d \
 echo "Orchestrator started at http://localhost:9983"
 echo "Swagger UI: http://localhost:9983/swagger"
 echo ""
-echo "Default login: admin / Admin1234 (password reset required on first login)"
+echo "Default login: admin@example.com / Admin1234 (password reset required on first login)"

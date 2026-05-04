@@ -23,7 +23,7 @@ You can also use the root helper with the docker-run backend:
 
 2. Set required environment variables:
    ```bash
-   export PII_SERVICE_LICENSE_KEY="<RDCTSRV,...>"
+   export PDFTOOLS_LICENSE_KEY="<RDCTSRV,...>"
    export ENCRYPTION_KEY=$(../scripts/generate-encryption-key.sh)
    export ORCHESTRATOR_JWT_SECRET=$(openssl rand -base64 64 | tr -d '\n')
    ```
@@ -74,8 +74,10 @@ docker rm smart-redact-manager smart-redact-worker smart-redact-orchestrator sma
 
 Or use the cleanup script (covers docker-run naming only):
 ```bash
-./cleanup.sh          # remove containers + network (keep volumes)
-./cleanup.sh --all    # also remove volumes (DELETES ALL DATA)
+./cleanup.sh                  # remove containers + network (keep volumes and images)
+./cleanup.sh --volumes        # also remove volumes (DELETES ALL DATA)
+./cleanup.sh --images         # also remove Smart Redact images
+./cleanup.sh --all            # remove volumes AND Smart Redact images (shorthand)
 ```
 
 > For Docker Compose deployments, use `docker compose down` (optionally `-v`) instead.

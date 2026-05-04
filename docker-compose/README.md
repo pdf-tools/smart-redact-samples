@@ -2,7 +2,7 @@
 
 Three Docker Compose configurations for different use cases.
 
-> For detailed configuration options, see [Smart Redact Configuration Guide](SMART_REDACT_DOCS_URL/configuration).
+> For detailed configuration options, see [Smart Redact Configuration Guide](https://www.pdf-tools.com/docs/smart-redact/configuration).
 
 ## Variants
 
@@ -63,7 +63,7 @@ docker compose up -d --wait
 
 | Variable | How to generate | Description |
 |----------|----------------|-------------|
-| `PII_SERVICE_LICENSE_KEY` | From your [PDF Tools account](SMART_REDACT_DOCS_URL/licensing) | License key |
+| `PDFTOOLS_LICENSE_KEY` | From your [PDF Tools account](https://www.pdf-tools.com/docs/smart-redact/licensing) | License key |
 | `ENCRYPTION_KEY` | `../../scripts/generate-encryption-key.sh` | AES-256-GCM file encryption key |
 | `ORCHESTRATOR_JWT_SECRET` | `openssl rand -base64 64 \| tr -d '\n'` | JWT signing secret (not needed for minimal) |
 
