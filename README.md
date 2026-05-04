@@ -40,7 +40,7 @@ flowchart LR
 ## Prerequisites
 
 - [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) v2+
-- A valid Smart Redact license key ([get one here](https://www.pdf-tools.com/docs/smart-redact/licensing))
+- A valid Smart Redact license key — register at [portal.pdf-tools.com](https://portal.pdf-tools.com/) to generate a free trial key, or see the [licensing docs](https://www.pdf-tools.com/docs/smart-redact/licensing) for production keys.
 - Docker Hub access to the `pdftoolsag` images. If the images are private, run `docker login` before `docker compose up` or `docker run`.
 - For GPU acceleration: NVIDIA GPU with [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html)
 
