@@ -4,7 +4,7 @@ Usage examples for the Smart Redact Manager API.
 
 > For the full API reference, see [Smart Redact API Documentation](https://www.pdf-tools.com/docs/smart-redact/api-reference).
 
-## Available Examples
+## Available examples
 
 | Language   | Directory          | Description                         |
 | ---------- | ------------------ | ----------------------------------- |
@@ -12,7 +12,7 @@ Usage examples for the Smart Redact Manager API.
 | **C#**     | [csharp/](csharp/) | .NET console app using `HttpClient` |
 | **Python** | [python/](python/) | Python scripts using `requests`     |
 
-## Typical Workflow
+## Typical workflow
 
 A standard PII detection and redaction workflow:
 
@@ -33,7 +33,7 @@ For asynchronous jobs:
 4. Keep using the DEK token from the initial async response for downloads
 ```
 
-## Running the Examples
+## Running the examples
 
 A sample PDF is included in the repository for testing. From the repository root:
 
@@ -52,7 +52,7 @@ python api-examples/python/full_workflow.py "samples/Sample Document — AI Smar
 dotnet run --project api-examples/csharp -- "samples/Sample Document — AI Smart Redact.pdf"
 ```
 
-## API Endpoints
+## API endpoints
 
 **Manager API** (default: http://localhost:9982):
 

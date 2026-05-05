@@ -1,4 +1,4 @@
-# C# API Example
+# C# API example
 
 Standalone .NET console application demonstrating the full Smart Redact workflow using only `HttpClient` (no external packages).
 The sample requests synchronous detection/redaction jobs and falls back to polling if the service returns an async response.
@@ -38,6 +38,6 @@ Example:
 MANAGER_URL=http://smartredact.example.com:9982 dotnet run --project api-examples/csharp -- "samples/Sample Document — AI Smart Redact.pdf"
 ```
 
-## API Reference
+## API reference
 
 For full API documentation, see the [Smart Redact API Reference](https://www.pdf-tools.com/docs/smart-redact/api-reference).

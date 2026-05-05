@@ -1,4 +1,4 @@
-# Pdftools Smart Redact - Samples Repository
+# Pdftools Smart Redact samples
 
 Sample configurations and examples for deploying and using [Smart Redact](https://www.pdf-tools.com/docs/smart-redact) by Pdftools.
 
@@ -43,7 +43,7 @@ flowchart LR
 - A valid Smart Redact license key — register at [portal.pdf-tools.com](https://portal.pdf-tools.com/) to generate a free trial key, or see the [licensing docs](https://www.pdf-tools.com/docs/smart-redact/licensing) for production keys.
 - For GPU acceleration: NVIDIA GPU with [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html)
 
-## Windows Users
+## Windows users
 
 The startup flow and API examples use bash. On Windows, use one of:
 
@@ -52,7 +52,7 @@ The startup flow and API examples use bash. On Windows, use one of:
 
 A standalone PowerShell key-generation helper is also included for manual key generation; `smart-redact.sh setup` generates keys automatically.
 
-## Quick Start
+## Quick start
 
 The fastest way to get Smart Redact running:
 
@@ -87,7 +87,7 @@ Default HITL / Orchestrator login:
 - **Email:** `admin@example.com`
 - **Password:** `Admin@1234!Tmp`
 
-## Repository Structure
+## Repository structure
 
 ```
 smart-redact-samples/
@@ -108,7 +108,7 @@ smart-redact-samples/
 └── scripts/                 # Utility scripts
 ```
 
-## Deployment Options
+## Deployment options
 
 | Option                                              | Best For                             | Guide                             |
 | --------------------------------------------------- | ------------------------------------ | --------------------------------- |
@@ -117,7 +117,7 @@ smart-redact-samples/
 | [Docker Compose (Minimal)](docker-compose/minimal/) | API-only usage without Orchestrator  | [Guide](docker-compose/README.md) |
 | [Docker Run](docker-run/)                           | Manual control over each container   | [Guide](docker-run/README.md)     |
 
-## API Examples
+## API examples
 
 See [api-examples/](api-examples/) for complete usage examples including:
 
@@ -129,7 +129,7 @@ See [api-examples/](api-examples/) for complete usage examples including:
 
 > For full API reference, see [Smart Redact API Documentation](https://www.pdf-tools.com/docs/smart-redact/api-reference).
 
-## Configuration Reference
+## Configuration reference
 
 All Smart Redact services are configured via environment variables:
 

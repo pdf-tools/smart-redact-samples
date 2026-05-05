@@ -1,8 +1,8 @@
-# Security Policy
+# Security policy
 
 We take the security of Smart Redact and these sample configurations seriously. If you believe you have found a security vulnerability, please report it privately as described below.
 
-## Reporting a Vulnerability
+## Reporting a vulnerability
 
 **Please do not file public GitHub issues for security vulnerabilities.**
 
@@ -26,11 +26,11 @@ This policy covers:
 
 The same address (`security@pdftools.com`) handles reports for both. You do not need to determine whether an issue is in the samples or the product before reporting it — we will route it internally.
 
-## Response Process
+## Response process
 
 After you submit a report, you can expect the following:
 
-1. **Acknowledgement** — within **5 business days**, confirming we received the report and have begun triage.
+1. **Acknowledgment** — within **5 business days**, confirming we received the report and have begun triage.
 2. **Initial assessment** — a follow-up with our preliminary severity assessment and any clarifying questions.
 3. **Remediation** — we will keep you informed as we develop, test, and release a fix. Timelines depend on severity and complexity.
 4. **Disclosure** — we prefer coordinated disclosure: please give us a reasonable window to release a fix before any public discussion.
