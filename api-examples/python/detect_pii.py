@@ -53,7 +53,7 @@ def upload_file(base_url, file_path):
 
 def start_detection(base_url, pdf_file_id, dek_token):
     """Start a Sensitive Information Detection job."""
-    url = f"{base_url}/v1/jobs/SIDetection"
+    url = f"{base_url}/v1/jobs/detection"
     payload = {
         "pdfFileId": pdf_file_id,
         "dekToken": dek_token,
@@ -136,7 +136,7 @@ def main():
 
     print("Starting PII detection ...")
     detection_start = start_detection(base_url, pdf_file_id, pdf_dek_token)
-    detection_result = resolve_job_response(base_url, "SIDetection", detection_start)
+    detection_result = resolve_job_response(base_url, "detection", detection_start)
     ensure_job_succeeded(detection_result, "Detection")
     print("Detection complete.\n")
 

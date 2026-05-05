@@ -54,7 +54,7 @@ def upload_file(base_url, file_path):
 
 def start_detection(base_url, pdf_file_id, dek_token):
     """Start a Sensitive Information Detection job."""
-    url = f"{base_url}/v1/jobs/SIDetection"
+    url = f"{base_url}/v1/jobs/detection"
     payload = {
         "pdfFileId": pdf_file_id,
         "dekToken": dek_token,
@@ -68,7 +68,7 @@ def start_detection(base_url, pdf_file_id, dek_token):
 
 def start_redaction(base_url, pdf_file_id, fdf_file_id, pdf_dek_token, fdf_dek_token, redactions):
     """Start a Sensitive Information Redaction job."""
-    url = f"{base_url}/v1/jobs/SIRedaction"
+    url = f"{base_url}/v1/jobs/redaction"
     payload = {
         "pdfFileId": pdf_file_id,
         "fdfFileId": fdf_file_id,
@@ -187,7 +187,7 @@ def main():
 
     print("Starting PII detection ...")
     detection_start = start_detection(base_url, pdf_file_id, pdf_dek_token)
-    detection_result = resolve_job_response(base_url, "SIDetection", detection_start)
+    detection_result = resolve_job_response(base_url, "detection", detection_start)
     ensure_job_succeeded(detection_result, "Detection")
     fdf_file = get_output_file(detection_start, "fdf") or get_output_file(detection_result, "fdf")
     if not fdf_file or not fdf_file.get("fileId") or not fdf_file.get("dekToken"):
@@ -206,7 +206,7 @@ def main():
         fdf_file["dekToken"],
         redactions,
     )
-    redaction_result = resolve_job_response(base_url, "SIRedaction", redaction_start)
+    redaction_result = resolve_job_response(base_url, "redaction", redaction_start)
     ensure_job_succeeded(redaction_result, "Redaction")
     redacted_pdf = get_output_file(redaction_start, "pdf") or get_output_file(redaction_result, "pdf")
     if not redacted_pdf or not redacted_pdf.get("fileId") or not redacted_pdf.get("dekToken"):

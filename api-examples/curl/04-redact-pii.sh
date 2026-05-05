@@ -70,7 +70,7 @@ echo "Starting PII redaction for PDF: $PDF_FILE_ID"
 echo ""
 
 response=$(curl -s -w "\n%{http_code}" \
-  -X POST "${MANAGER_URL}/v1/jobs/SIRedaction" \
+  -X POST "${MANAGER_URL}/v1/jobs/redaction" \
   -H "Content-Type: application/json" \
   -d "$payload")
 

@@ -93,16 +93,16 @@ var detectionPayload = new
     processingMode = "sync"
 };
 
-Console.WriteLine($"  POST {baseUrl}/v1/jobs/SIDetection");
+Console.WriteLine($"  POST {baseUrl}/v1/jobs/detection");
 Console.WriteLine($"  Payload: {JsonSerializer.Serialize(detectionPayload)}");
 
-var detectionStartResponse = await PostAsJsonWithTimeout(client, "/v1/jobs/SIDetection", detectionPayload, jobTimeoutSeconds);
+var detectionStartResponse = await PostAsJsonWithTimeout(client, "/v1/jobs/detection", detectionPayload, jobTimeoutSeconds);
 detectionStartResponse.EnsureSuccessStatusCode();
 
 var detectionStart = await ReadJsonElementAsync(detectionStartResponse, jsonOptions);
 PrintJson("Detection start response", detectionStart);
 
-var detectionResult = await ResolveJobResponse(client, "SIDetection", detectionStart, jsonOptions);
+var detectionResult = await ResolveJobResponse(client, "detection", detectionStart, jsonOptions);
 if (TryGetString(detectionStart, "jobStatus") == "inProgress")
 {
     PrintJson("Detection result", detectionResult);
@@ -139,16 +139,16 @@ var redactionPayload = new
     processingMode = "sync"
 };
 
-Console.WriteLine($"  POST {baseUrl}/v1/jobs/SIRedaction");
+Console.WriteLine($"  POST {baseUrl}/v1/jobs/redaction");
 Console.WriteLine($"  Payload: {JsonSerializer.Serialize(redactionPayload)}");
 
-var redactionStartResponse = await PostAsJsonWithTimeout(client, "/v1/jobs/SIRedaction", redactionPayload, jobTimeoutSeconds);
+var redactionStartResponse = await PostAsJsonWithTimeout(client, "/v1/jobs/redaction", redactionPayload, jobTimeoutSeconds);
 redactionStartResponse.EnsureSuccessStatusCode();
 
 var redactionStart = await ReadJsonElementAsync(redactionStartResponse, jsonOptions);
 PrintJson("Redaction start response", redactionStart);
 
-var redactionResult = await ResolveJobResponse(client, "SIRedaction", redactionStart, jsonOptions);
+var redactionResult = await ResolveJobResponse(client, "redaction", redactionStart, jsonOptions);
 if (TryGetString(redactionStart, "jobStatus") == "inProgress")
 {
     PrintJson("Redaction result", redactionResult);
