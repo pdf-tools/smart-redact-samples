@@ -80,7 +80,11 @@ The CPU and GPU full-stack variants start the human-in-the-loop review UI at `ht
 
 When the stack is exposed through a remote host or reverse proxy, set `HITL_ORCHESTRATOR_URL` to the externally reachable Orchestrator URL. The HITL Web UI talks to the Manager only indirectly, through the Orchestrator.
 
-> **Note:** The provided `docker-compose.yml` files hardcode the PostgreSQL password as `smartredact` for local demonstration only. For any non-local deployment, replace it with a strong, per-environment value (e.g. `openssl rand -base64 32 | tr -d '=+/' | head -c 32`) and inject it via your secret store rather than committing it.
+> **Note:** The provided `docker-compose.yml` files hardcode default credentials for local demonstration only:
+> - PostgreSQL: user/password `smartredact` / `smartredact`
+> - RabbitMQ: user/password `guest` / `guest`
+>
+> For any non-local deployment, replace these with strong values.
 
 ## Verifying the Deployment
 

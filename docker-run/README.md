@@ -28,6 +28,12 @@ You can also use the root helper with the docker-run backend:
    export ORCHESTRATOR_JWT_SECRET=$(openssl rand -base64 64 | tr -d '\n')
    ```
 
+> **Note:** The scripts in this folder hardcode default credentials for local demonstration only:
+> - PostgreSQL: user/password `smartredact` / `smartredact`
+> - RabbitMQ: user/password `guest` / `guest`
+>
+> For any non-local deployment, replace these with strong values.
+
 ## Usage
 
 ### Start all services at once
