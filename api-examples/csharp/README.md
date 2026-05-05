@@ -13,29 +13,29 @@ The sample requests synchronous detection/redaction jobs and falls back to polli
 Run with an input PDF (from the repository root):
 
 ```bash
-dotnet run --project api-examples/csharp -- "samples/Sample Document — AI Smart Redact.pdf"
+dotnet run --project api-examples/csharp -- "samples/Sample Document - AI Smart Redact.pdf"
 ```
 
 Specify an output path:
 
 ```bash
-dotnet run --project api-examples/csharp -- "samples/Sample Document — AI Smart Redact.pdf" redacted.pdf
+dotnet run --project api-examples/csharp -- "samples/Sample Document - AI Smart Redact.pdf" redacted.pdf
 ```
 
 If you don't specify an output path, the sample saves the redacted file as `<input>_redacted.pdf` in the current directory.
 
 ## Configuration
 
-| Environment Variable | Default | Description |
-|----------------------|---------|-------------|
-| `MANAGER_URL` | `http://localhost:9982` | AI Smart Redact Manager base URL |
-| `SMART_REDACT_HTTP_TIMEOUT_SECONDS` | `120` | Timeout for upload, download, and polling HTTP calls |
-| `SMART_REDACT_JOB_TIMEOUT_SECONDS` | `3600` | Timeout for synchronous detection/redaction requests |
+| Environment Variable                | Default                 | Description                                          |
+| ----------------------------------- | ----------------------- | ---------------------------------------------------- |
+| `MANAGER_URL`                       | `http://localhost:9982` | AI Smart Redact Manager base URL                     |
+| `SMART_REDACT_HTTP_TIMEOUT_SECONDS` | `120`                   | Timeout for upload, download, and polling HTTP calls |
+| `SMART_REDACT_JOB_TIMEOUT_SECONDS`  | `3600`                  | Timeout for synchronous detection/redaction requests |
 
 Example:
 
 ```bash
-MANAGER_URL=http://smartredact.example.com:9982 dotnet run --project api-examples/csharp -- "samples/Sample Document — AI Smart Redact.pdf"
+MANAGER_URL=http://smartredact.example.com:9982 dotnet run --project api-examples/csharp -- "samples/Sample Document - AI Smart Redact.pdf"
 ```
 
 ## API reference
