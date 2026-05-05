@@ -61,7 +61,7 @@ services:
       smart-redact-storage-init:
         condition: service_completed_successfully
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9982/healthz/ready"]
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9982/healthz/ready"]
       interval: 10s
       timeout: 15s
       start_period: 30s
@@ -91,7 +91,7 @@ services:
       smart-redact-storage-init:
         condition: service_completed_successfully
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4885/healthz/ready"]
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:4885/healthz/ready"]
       interval: 10s
       timeout: 30s
       start_period: 60s
@@ -121,7 +121,7 @@ services:
       smart-redact-orchestrator-db:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9983/healthz/ready"]
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9983/healthz/ready"]
       interval: 10s
       timeout: 15s
       start_period: 30s

@@ -122,7 +122,7 @@ PY
 )
 
 detect_body=$(curl -sS --max-time "$JOB_TIMEOUT" \
-  -X POST "${MANAGER_URL}/v1/jobs/SIDetection" \
+  -X POST "${MANAGER_URL}/v1/jobs/detection" \
   -H "Content-Type: application/json" \
   -d "$detect_payload")
 
@@ -177,7 +177,7 @@ PY
 )
 
 redact_body=$(curl -sS --max-time "$JOB_TIMEOUT" \
-  -X POST "${MANAGER_URL}/v1/jobs/SIRedaction" \
+  -X POST "${MANAGER_URL}/v1/jobs/redaction" \
   -H "Content-Type: application/json" \
   -d "$redact_payload")
 

@@ -76,7 +76,7 @@ def upload_file(base_url, file_path):
 
 def start_detection(base_url, pdf_file_id, dek_token):
     """Start a Sensitive Information Detection job."""
-    url = f"{base_url}/v1/jobs/SIDetection"
+    url = f"{base_url}/v1/jobs/detection"
     payload = {
         "pdfFileId": pdf_file_id,
         "dekToken": dek_token,
@@ -92,7 +92,7 @@ def start_detection(base_url, pdf_file_id, dek_token):
 
 def start_redaction(base_url, pdf_file_id, fdf_file_id, pdf_dek_token, fdf_dek_token, redactions):
     """Start a Sensitive Information Redaction job."""
-    url = f"{base_url}/v1/jobs/SIRedaction"
+    url = f"{base_url}/v1/jobs/redaction"
     payload = {
         "pdfFileId": pdf_file_id,
         "fdfFileId": fdf_file_id,
@@ -228,7 +228,7 @@ def main():
     detection_start = start_detection(base_url, pdf_file_id, pdf_dek_token)
     print_json("Detection start response", detection_start)
 
-    detection_result = resolve_job_response(base_url, "SIDetection", detection_start)
+    detection_result = resolve_job_response(base_url, "detection", detection_start)
     if detection_result is not detection_start:
         print_json("Detection result", detection_result)
     ensure_job_succeeded(detection_result, "Detection")
@@ -253,7 +253,7 @@ def main():
     )
     print_json("Redaction start response", redaction_start)
 
-    redaction_result = resolve_job_response(base_url, "SIRedaction", redaction_start)
+    redaction_result = resolve_job_response(base_url, "redaction", redaction_start)
     if redaction_result is not redaction_start:
         print_json("Redaction result", redaction_result)
     ensure_job_succeeded(redaction_result, "Redaction")

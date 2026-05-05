@@ -36,4 +36,4 @@ docker run -d \
 echo "Orchestrator started at http://localhost:9983"
 echo "Swagger UI: http://localhost:9983/swagger"
 echo ""
-echo "Default login: admin@example.com / Admin1234 (password reset required on first login)"
+echo "Default login: admin@example.com / Admin@1234!Tmp (password reset required on first login)"

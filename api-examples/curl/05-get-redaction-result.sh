@@ -14,7 +14,7 @@ echo "Polling redaction result for job: $JOB_ID"
 echo ""
 
 response=$(curl -s -w "\n%{http_code}" \
-  -X GET "${MANAGER_URL}/v1/jobs/SIRedaction/${JOB_ID}/result")
+  -X GET "${MANAGER_URL}/v1/jobs/redaction/${JOB_ID}/result")
 
 http_code=$(echo "$response" | tail -n1)
 body=$(echo "$response" | sed '$d')

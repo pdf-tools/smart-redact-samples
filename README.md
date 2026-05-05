@@ -1,12 +1,12 @@
-# Pdftools Smart Redact - Samples Repository
+# Pdftools AI Smart Redact samples
 
-Sample configurations and examples for deploying and using [Smart Redact](https://www.pdf-tools.com/docs/smart-redact) by Pdftools.
+Sample configurations and examples for deploying and using [AI Smart Redact](https://www.pdf-tools.com/docs/smart-redact) by Pdftools.
 
-Smart Redact automatically detects and redacts personally identifiable information (PII) in PDF documents using pattern matching, keyword detection, and ML-based named entity recognition (GLiNER).
+AI Smart Redact automatically detects and redacts personally identifiable information (PII) in PDF documents using pattern matching, keyword detection, and ML-based named entity recognition (GLiNER).
 
 ## Architecture
 
-Smart Redact consists of four services:
+AI Smart Redact consists of four services:
 
 ```mermaid
 flowchart LR
@@ -28,34 +28,35 @@ flowchart LR
     Manager --- ManagerDB
 ```
 
-| Service | Port | Description |
-|---------|------|-------------|
-| **Manager** | 9982 | Client-facing API for file uploads and detection/redaction jobs |
-| **Worker** | 4885 | Internal service that performs PII detection and redaction |
-| **Orchestrator** | 9983 | Web UI backend with user management and JWT authentication |
-| **HITL Web UI** | 3000 | Human-in-the-loop review interface for detection results and redaction jobs |
+| Service          | Port | Description                                                                 |
+| ---------------- | ---- | --------------------------------------------------------------------------- |
+| **HITL Web UI**  | 3000 | Human-in-the-loop review interface for detection results and redaction jobs |
+| **Orchestrator** | 9983 | Web UI backend with user management and JWT authentication                  |
+| **Manager**      | 9982 | Client-facing API for file uploads and detection/redaction jobs             |
+| **Worker**       | 4885 | Internal service that performs PII detection and redaction                  |
 
-> For detailed architecture documentation, see [Smart Redact Architecture](https://www.pdf-tools.com/docs/smart-redact/architecture).
+> For detailed architecture documentation, refer to [AI Smart Redact Architecture](https://www.pdf-tools.com/docs/smart-redact/architecture).
 
 ## Prerequisites
 
 - [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) v2+
-- A valid Smart Redact license key ([get one here](https://www.pdf-tools.com/docs/smart-redact/licensing))
-- Docker Hub access to the `pdftoolsag` images. If the images are private, run `docker login` before `docker compose up` or `docker run`.
+- A valid AI Smart Redact license key — register at [portal.pdf-tools.com](https://portal.pdf-tools.com/) to generate a free trial key, or see the [licensing docs](https://www.pdf-tools.com/docs/smart-redact/licensing) for production keys.
 - For GPU acceleration: NVIDIA GPU with [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html)
 
-## Windows Users
+## Windows users
 
 The startup flow and API examples use bash. On Windows, use one of:
 
 - **WSL2** (recommended) — full Linux environment. Docker Desktop integrates with WSL2 natively, so `docker` commands just work.
 - **Git Bash** — bundled with [Git for Windows](https://git-scm.com/download/win). Sufficient for all Docker-based scripts in this repo, provided Docker Desktop is running and `python3` is available on `PATH` (needed by the curl API examples).
 
-A standalone PowerShell key-generation helper is also included for manual key generation; `smart-redact.sh setup` generates keys automatically.
+The repository also includes a standalone PowerShell key-generation helper for manual key generation; `smart-redact.sh setup` generates keys automatically.
 
-## Quick Start
+## Quick start
 
-The fastest way to get Smart Redact running:
+The fastest way to get AI Smart Redact running:
+
+**Prerequisites:** A valid AI Smart Redact license key — register at [portal.pdf-tools.com](https://portal.pdf-tools.com/) to generate a free trial key, or see the [licensing docs](https://www.pdf-tools.com/docs/smart-redact/licensing) for production keys.
 
 ```bash
 # 1. Clone this repository
@@ -76,18 +77,22 @@ cd smart-redact-samples
 ```
 
 Once running:
+
+- **HITL Web UI:** http://localhost:3000
 - **Manager API (Swagger):** http://localhost:9982/swagger
 - **Orchestrator API (Swagger):** http://localhost:9983/swagger
-- **HITL Web UI:** http://localhost:3000
 
 Default HITL / Orchestrator login:
-- **Email:** `admin@example.com`
-- **Password:** `Admin1234`
 
-## Repository Structure
+- **Email:** `admin@example.com`
+- **Password:** `Admin@1234!Tmp`
+
+## Repository structure
 
 ```
 smart-redact-samples/
+├── samples/                 # Sample documents for testing
+│
 ├── docker-compose/          # Docker Compose deployments
 │   ├── cpu/                 #   Full stack (CPU inference)
 │   ├── gpu/                 #   Full stack (GPU inference, NVIDIA CUDA)
@@ -103,44 +108,45 @@ smart-redact-samples/
 └── scripts/                 # Utility scripts
 ```
 
-## Deployment Options
+## Deployment options
 
-| Option | Best For | Guide |
-|--------|----------|-------|
-| [Docker Compose (CPU)](docker-compose/cpu/) | Quick start, development, evaluation | [Guide](docker-compose/README.md) |
-| [Docker Compose (GPU)](docker-compose/gpu/) | Production with GPU acceleration | [Guide](docker-compose/README.md) |
-| [Docker Compose (Minimal)](docker-compose/minimal/) | API-only usage without Orchestrator | [Guide](docker-compose/README.md) |
-| [Docker Run](docker-run/) | Manual control over each container | [Guide](docker-run/README.md) |
+| Option                                              | Best For                             | Guide                             |
+| --------------------------------------------------- | ------------------------------------ | --------------------------------- |
+| [Docker Compose (CPU)](docker-compose/cpu/)         | Quick start, development, evaluation | [Guide](docker-compose/README.md) |
+| [Docker Compose (GPU)](docker-compose/gpu/)         | Production with GPU acceleration     | [Guide](docker-compose/README.md) |
+| [Docker Compose (Minimal)](docker-compose/minimal/) | API-only usage without Orchestrator  | [Guide](docker-compose/README.md) |
+| [Docker Run](docker-run/)                           | Manual control over each container   | [Guide](docker-run/README.md)     |
 
-## API Examples
+## API examples
 
-See [api-examples/](api-examples/) for complete usage examples including:
+For complete usage examples, refer to [api-examples/](api-examples/), which covers:
+
 - Uploading PDF files
 - Running PII detection
 - Downloading detection results
 - Running PII redaction
 - End-to-end workflows
 
-> For full API reference, see [Smart Redact API Documentation](https://www.pdf-tools.com/docs/smart-redact/api-reference).
+> For the full API reference, refer to [AI Smart Redact API Documentation](https://www.pdf-tools.com/docs/smart-redact/api-reference).
 
-## Configuration Reference
+## Configuration reference
 
-All Smart Redact services are configured via environment variables:
+Configure all AI Smart Redact services through environment variables:
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `PDFTOOLS_LICENSE_KEY` | Yes | Smart Redact license key |
-| `ENCRYPTION_KEY` | Yes | 32-byte Base64-encoded AES-256-GCM key |
-| `ORCHESTRATOR_JWT_SECRET` | Yes* | JWT signing secret (min 32 chars). *Only for Orchestrator. |
-| `VERSION` | No | Docker image tag (default: `latest`) |
-| `HITL_WEB_PORT` | No | Host port for the HITL Web UI (default: `3000`) |
-| `HITL_ORCHESTRATOR_URL` | No | Browser-facing Orchestrator API URL used by the HITL Web UI (default: `http://localhost:9983`) |
+| Variable                  | Required | Description                                                                                    |
+| ------------------------- | -------- | ---------------------------------------------------------------------------------------------- |
+| `PDFTOOLS_LICENSE_KEY`    | Yes      | AI Smart Redact license key                                                                       |
+| `ENCRYPTION_KEY`          | Yes      | 32-byte Base64-encoded AES-256-GCM key                                                         |
+| `ORCHESTRATOR_JWT_SECRET` | Yes\*    | JWT signing secret (min 32 chars). \*Only for Orchestrator.                                    |
+| `VERSION`                 | No       | Docker image tag (default: `latest`)                                                           |
+| `HITL_WEB_PORT`           | No       | Host port for the HITL Web UI (default: `3000`)                                                |
+| `HITL_ORCHESTRATOR_URL`   | No       | Browser-facing Orchestrator API URL used by the HITL Web UI (default: `http://localhost:9983`) |
 
-> For all configuration options, see [Smart Redact Configuration Guide](https://www.pdf-tools.com/docs/smart-redact/configuration).
+> For all configuration options, refer to [AI Smart Redact Configuration Guide](https://www.pdf-tools.com/docs/smart-redact/configuration).
 
 ## Documentation
 
-- [Smart Redact Documentation](https://www.pdf-tools.com/docs/smart-redact)
+- [AI Smart Redact Documentation](https://www.pdf-tools.com/docs/smart-redact)
 - [Configuration Guide](https://www.pdf-tools.com/docs/smart-redact/configuration)
 - [API Reference](https://www.pdf-tools.com/docs/smart-redact/api-reference)
 - [Architecture](https://www.pdf-tools.com/docs/smart-redact/architecture)
@@ -148,4 +154,4 @@ All Smart Redact services are configured via environment variables:
 
 ## License
 
-This repository contains sample configurations for Smart Redact, a commercial product by [PDF Tools AG](https://www.pdf-tools.com). A valid license key is required to run the service.
+This repository contains sample configurations for AI Smart Redact, a commercial product by [PDF Tools AG](https://www.pdf-tools.com). Running the service requires a valid license key.

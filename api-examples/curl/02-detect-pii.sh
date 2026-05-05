@@ -48,7 +48,7 @@ echo "Starting PII detection for PDF: $PDF_FILE_ID"
 echo ""
 
 response=$(curl -s -w "\n%{http_code}" \
-  -X POST "${MANAGER_URL}/v1/jobs/SIDetection" \
+  -X POST "${MANAGER_URL}/v1/jobs/detection" \
   -H "Content-Type: application/json" \
   -d "$payload")
 
