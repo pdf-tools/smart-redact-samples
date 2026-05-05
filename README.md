@@ -144,6 +144,17 @@ Configure all AI Smart Redact services through environment variables:
 
 > For all configuration options, refer to [AI Smart Redact Configuration Guide](https://www.pdf-tools.com/docs/smart-redact/configuration).
 
+## Security notes
+
+The Docker Compose files and `docker-run/` scripts in this repository hardcode default credentials for local demonstration only:
+
+| Service    | User          | Password      |
+| ---------- | ------------- | ------------- |
+| PostgreSQL | `smartredact` | `smartredact` |
+| RabbitMQ   | `guest`       | `guest`       |
+
+For any non-local deployment, replace these with strong values.
+
 ## Documentation
 
 - [AI Smart Redact Documentation](https://www.pdf-tools.com/docs/smart-redact)
