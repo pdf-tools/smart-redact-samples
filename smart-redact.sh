@@ -601,6 +601,7 @@ cmd_docker_run_pull() {
   local version="${VERSION:-latest}"
   docker pull postgres:15-alpine
   docker pull alpine:3
+  docker pull rabbitmq:4-management-alpine
   docker pull "pdftoolsag/smart-redact-manager:${version}"
   docker pull "pdftoolsag/smart-redact-orchestrator:${version}"
   docker pull "pdftoolsag/smart-redact-hitl-web:${version}"
