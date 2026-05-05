@@ -1,0 +1,254 @@
+# =============================================================================
+# Smart Redact - Full Stack (GPU)
+# =============================================================================
+# Starts all services with GPU-accelerated Worker using NVIDIA CUDA, plus the HITL Web UI.
+#
+# Requirements:
+#   - NVIDIA GPU
+#   - NVIDIA Container Toolkit: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html
+#
+# Usage:
+#   cp .env.example .env    # fill in required values
+#   docker compose up -d --wait
+#
+# Services:
+#   - Manager API:      http://localhost:9982  (Swagger: http://localhost:9982/swagger)
+#   - Orchestrator API: http://localhost:9983  (Swagger: http://localhost:9983/swagger)
+#   - HITL Web UI:      http://localhost:3000
+#   - Worker API:       internal only (port 4885)
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # Storage init - chowns shared volume to app user (UID/GID 1654) so that
+  # the non-root Manager and Worker containers can write to it. Runs once
+  # on startup, exits. Manager and Worker wait for it via depends_on.
+  # ---------------------------------------------------------------------------
+  smart-redact-storage-init:
+    image: alpine:3
+    container_name: smart-redact-storage-init
+    user: "0:0"
+    command: ["sh", "-c", "chown -R 1654:1654 /app/storage_folder /app/logs && chmod -R u+rwX,g+rwX /app/storage_folder /app/logs"]
+    volumes:
+      - storage:/app/storage_folder
+      - logs:/app/logs
+    restart: "no"
+
+  # ---------------------------------------------------------------------------
+  # RabbitMQ - Message broker for Manager <-> Worker communication
+  # ---------------------------------------------------------------------------
+  smart-redact-rabbitmq:
+    image: rabbitmq:4-management-alpine
+    container_name: smart-redact-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    expose:
+      - "5672"
+    networks:
+      - smart-redact-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_port_connectivity"]
+      interval: 10s
+      timeout: 10s
+      start_period: 30s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
+  # Manager - Client-facing API for files and jobs
+  # ---------------------------------------------------------------------------
+  smart-redact-manager:
+    image: pdftoolsag/smart-redact-manager:${VERSION:-latest}
+    container_name: smart-redact-manager
+    ports:
+      - "9982:9982"
+    environment:
+      ServiceCommunication__ServiceCommunicationType: "RabbitMQ"
+      ServiceCommunication__Host: "smart-redact-rabbitmq"
+      ServiceCommunication__Username: "guest"
+      ServiceCommunication__Password: "guest"
+      Database__DatabaseType: "PostgreSql"
+      Database__ConnectionString: "User ID=smartredact;Password=smartredact;Server=smart-redact-manager-db;Port=5432;Database=smartredact;Maximum Pool Size=50;Timeout=30;"
+      FileStorage__FileStorageType: "HostFileSystem"
+      FileStorage__FilesDirectoryPath: "/app/storage_folder"
+      Encryption__EncryptionKey: "${ENCRYPTION_KEY}"
+      Encryption__DekTokenTtlMinutes: 1440
+      Licensing__LicenseKey: "${PDFTOOLS_LICENSE_KEY}"
+    volumes:
+      - storage:/app/storage_folder
+      - logs:/app/logs
+    networks:
+      - smart-redact-network
+    restart: unless-stopped
+    depends_on:
+      smart-redact-manager-db:
+        condition: service_healthy
+      smart-redact-rabbitmq:
+        condition: service_healthy
+      smart-redact-storage-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9982/healthz/ready"]
+      interval: 10s
+      timeout: 15s
+      start_period: 30s
+      retries: 30
+
+  # ---------------------------------------------------------------------------
+  # Worker - PII detection and redaction engine (GPU / NVIDIA CUDA)
+  # ---------------------------------------------------------------------------
+  smart-redact-worker:
+    image: pdftoolsag/smart-redact-worker:${VERSION:-latest}-cuda
+    container_name: smart-redact-worker
+    expose:
+      - "4885"
+    environment:
+      ServiceCommunication__ServiceCommunicationType: "RabbitMQ"
+      ServiceCommunication__Host: "smart-redact-rabbitmq"
+      ServiceCommunication__Username: "guest"
+      ServiceCommunication__Password: "guest"
+      Licensing__LicenseKey: "${PDFTOOLS_LICENSE_KEY}"
+      Encryption__EncryptionKey: "${ENCRYPTION_KEY}"
+      Encryption__DekTokenTtlMinutes: 1440
+      FileStorage__FileStorageType: "HostFileSystem"
+      FileStorage__FilesDirectoryPath: "/app/storage_folder"
+      Inference__ExecutionProvider: "Auto"
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: compute,utility
+    volumes:
+      - storage:/app/storage_folder
+      - logs:/app/logs
+    networks:
+      - smart-redact-network
+    restart: unless-stopped
+    depends_on:
+      smart-redact-storage-init:
+        condition: service_completed_successfully
+      smart-redact-rabbitmq:
+        condition: service_healthy
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:4885/healthz/ready"]
+      interval: 10s
+      timeout: 30s
+      start_period: 60s
+      retries: 30
+
+  # ---------------------------------------------------------------------------
+  # Orchestrator - Web UI backend, user management, JWT auth
+  # ---------------------------------------------------------------------------
+  smart-redact-orchestrator:
+    image: pdftoolsag/smart-redact-orchestrator:${VERSION:-latest}
+    container_name: smart-redact-orchestrator
+    ports:
+      - "9983:9983"
+    environment:
+      ManagerApi__BaseUrl: "http://smart-redact-manager:9982/"
+      ManagerApi__PollingIntervalSeconds: 3
+      Database__DatabaseType: "PostgreSql"
+      Database__ConnectionString: "User ID=smartredact;Password=smartredact;Server=smart-redact-orchestrator-db;Port=5432;Database=smartredact;Maximum Pool Size=50;Timeout=30;"
+      Jwt__SecretKey: "${ORCHESTRATOR_JWT_SECRET}"
+      Licensing__LicenseKey: "${PDFTOOLS_LICENSE_KEY}"
+    volumes:
+      - logs:/app/logs
+    networks:
+      - smart-redact-network
+    restart: unless-stopped
+    depends_on:
+      smart-redact-orchestrator-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9983/healthz/ready"]
+      interval: 10s
+      timeout: 15s
+      start_period: 30s
+      retries: 30
+
+  # ---------------------------------------------------------------------------
+  # HITL Web UI - Human-in-the-loop review interface
+  # ---------------------------------------------------------------------------
+  smart-redact-hitl-web:
+    image: pdftoolsag/smart-redact-hitl-web:${VERSION:-latest}
+    container_name: smart-redact-hitl-web
+    ports:
+      - "${HITL_WEB_PORT:-3000}:8080"
+    environment:
+      ORCHESTRATOR_HOST: "smart-redact-orchestrator"
+      VITE_API_URL: "${HITL_ORCHESTRATOR_URL:-http://localhost:9983}"
+    networks:
+      - smart-redact-network
+    restart: unless-stopped
+    depends_on:
+      smart-redact-orchestrator:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/ > /dev/null || exit 1"]
+      interval: 10s
+      timeout: 10s
+      start_period: 20s
+      retries: 12
+
+  # ---------------------------------------------------------------------------
+  # PostgreSQL - Manager database
+  # ---------------------------------------------------------------------------
+  smart-redact-manager-db:
+    image: postgres:15-alpine
+    container_name: smart-redact-manager-db
+    environment:
+      POSTGRES_USER: smartredact
+      POSTGRES_PASSWORD: smartredact
+      POSTGRES_DB: smartredact
+      TZ: UTC
+    expose:
+      - "5432"
+    volumes:
+      - pgdata-manager:/var/lib/postgresql/data
+    networks:
+      - smart-redact-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "smartredact"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
+  # PostgreSQL - Orchestrator database
+  # ---------------------------------------------------------------------------
+  smart-redact-orchestrator-db:
+    image: postgres:15-alpine
+    container_name: smart-redact-orchestrator-db
+    environment:
+      POSTGRES_USER: smartredact
+      POSTGRES_PASSWORD: smartredact
+      POSTGRES_DB: smartredact
+      TZ: UTC
+    expose:
+      - "5432"
+    volumes:
+      - pgdata-orchestrator:/var/lib/postgresql/data
+    networks:
+      - smart-redact-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "smartredact"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  storage:
+  logs:
+  pgdata-manager:
+  pgdata-orchestrator:
+
+networks:
+  smart-redact-network:
+    driver: bridge
