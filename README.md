@@ -41,7 +41,6 @@ flowchart LR
 
 - [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) v2+
 - A valid Smart Redact license key — register at [portal.pdf-tools.com](https://portal.pdf-tools.com/) to generate a free trial key, or see the [licensing docs](https://www.pdf-tools.com/docs/smart-redact/licensing) for production keys.
-- Docker Hub access to the `pdftoolsag` images. If the images are private, run `docker login` before `docker compose up` or `docker run`.
 - For GPU acceleration: NVIDIA GPU with [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html)
 
 ## Windows Users
@@ -56,6 +55,8 @@ A standalone PowerShell key-generation helper is also included for manual key ge
 ## Quick Start
 
 The fastest way to get Smart Redact running:
+
+**Prerequisites:** A valid Smart Redact license key — register at [portal.pdf-tools.com](https://portal.pdf-tools.com/) to generate a free trial key, or see the [licensing docs](https://www.pdf-tools.com/docs/smart-redact/licensing) for production keys.
 
 ```bash
 # 1. Clone this repository
@@ -80,7 +81,6 @@ Once running:
 - **HITL Web UI:** http://localhost:3000
 - **Manager API (Swagger):** http://localhost:9982/swagger
 - **Orchestrator API (Swagger):** http://localhost:9983/swagger
-
 
 Default HITL / Orchestrator login:
 
