@@ -44,7 +44,7 @@ The repository includes a sample PDF for testing. From the repository root:
 
 **Python (full workflow):**
 ```bash
-python api-examples/python/full_workflow.py "samples/Sample Document — AI Smart Redact.pdf"
+python3 api-examples/python/full_workflow.py "samples/Sample Document — AI Smart Redact.pdf"
 ```
 
 **C# (full workflow):**
