@@ -33,6 +33,25 @@ For asynchronous jobs:
 4. Keep using the DEK token from the initial async response for downloads
 ```
 
+## Running the Examples
+
+A sample PDF is included in the repository for testing. From the repository root:
+
+**curl (full workflow):**
+```bash
+./api-examples/curl/full-workflow.sh "samples/Sample Document — AI Smart Redact.pdf"
+```
+
+**Python (full workflow):**
+```bash
+python api-examples/python/full_workflow.py "samples/Sample Document — AI Smart Redact.pdf"
+```
+
+**C# (full workflow):**
+```bash
+dotnet run --project api-examples/csharp -- "samples/Sample Document — AI Smart Redact.pdf"
+```
+
 ## API Endpoints
 
 **Manager API** (default: http://localhost:9982):

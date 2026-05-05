@@ -10,16 +10,16 @@ The sample requests synchronous detection/redaction jobs and falls back to polli
 
 ## Usage
 
-Run with an input PDF:
+Run with an input PDF (from the repository root):
 
 ```bash
-dotnet run -- path/to/file.pdf
+dotnet run --project api-examples/csharp -- "samples/Sample Document — AI Smart Redact.pdf"
 ```
 
 Specify an output path:
 
 ```bash
-dotnet run -- input.pdf output.pdf
+dotnet run --project api-examples/csharp -- "samples/Sample Document — AI Smart Redact.pdf" redacted.pdf
 ```
 
 If no output path is given, the redacted file is saved as `<input>_redacted.pdf` in the current directory.
@@ -35,7 +35,7 @@ If no output path is given, the redacted file is saved as `<input>_redacted.pdf`
 Example:
 
 ```bash
-MANAGER_URL=http://smartredact.example.com:9982 dotnet run -- input.pdf
+MANAGER_URL=http://smartredact.example.com:9982 dotnet run --project api-examples/csharp -- "samples/Sample Document — AI Smart Redact.pdf"
 ```
 
 ## API Reference

@@ -91,6 +91,8 @@ Default HITL / Orchestrator login:
 
 ```
 smart-redact-samples/
+├── samples/                 # Sample documents for testing
+│
 ├── docker-compose/          # Docker Compose deployments
 │   ├── cpu/                 #   Full stack (CPU inference)
 │   ├── gpu/                 #   Full stack (GPU inference, NVIDIA CUDA)
