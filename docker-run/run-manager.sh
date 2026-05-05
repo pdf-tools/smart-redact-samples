@@ -19,7 +19,10 @@ docker run -d \
   --network "$NETWORK" \
   --restart unless-stopped \
   -p 9982:9982 \
-  -e "ServiceCommunication__ConnectionString=http://smart-redact-worker:4885/" \
+  -e "ServiceCommunication__ServiceCommunicationType=RabbitMQ" \
+  -e "ServiceCommunication__Host=smart-redact-rabbitmq" \
+  -e "ServiceCommunication__Username=guest" \
+  -e "ServiceCommunication__Password=guest" \
   -e "Database__DatabaseType=PostgreSql" \
   -e "Database__ConnectionString=User ID=smartredact;Password=smartredact;Server=smart-redact-manager-db;Port=5432;Database=smartredact;Maximum Pool Size=50;Timeout=30;" \
   -e "FileStorage__FileStorageType=HostFileSystem" \

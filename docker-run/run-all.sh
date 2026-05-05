@@ -13,15 +13,19 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 echo "=== Starting Smart Redact ==="
 echo ""
 
-echo "[1/6] Initializing shared volumes..."
+echo "[1/7] Initializing shared volumes..."
 "${SCRIPT_DIR}/run-storage-init.sh"
 echo ""
 
-echo "[2/6] Starting databases..."
+echo "[2/7] Starting databases..."
 "${SCRIPT_DIR}/run-postgres.sh"
 echo ""
 
-echo "[3/6] Starting Worker..."
+echo "[3/7] Starting RabbitMQ..."
+"${SCRIPT_DIR}/run-rabbitmq.sh"
+echo ""
+
+echo "[4/7] Starting Worker..."
 "${SCRIPT_DIR}/run-worker.sh"
 echo "Waiting for Worker to become healthy..."
 WORKER_HEALTH_TIMEOUT_SECONDS="${WORKER_HEALTH_TIMEOUT_SECONDS:-300}"
@@ -38,15 +42,15 @@ done
 echo "Worker is ready."
 echo ""
 
-echo "[4/6] Starting Manager..."
+echo "[5/7] Starting Manager..."
 "${SCRIPT_DIR}/run-manager.sh"
 echo ""
 
-echo "[5/6] Starting Orchestrator..."
+echo "[6/7] Starting Orchestrator..."
 "${SCRIPT_DIR}/run-orchestrator.sh"
 echo ""
 
-echo "[6/6] Starting HITL Web UI..."
+echo "[7/7] Starting HITL Web UI..."
 "${SCRIPT_DIR}/run-hitl-web.sh"
 echo ""
 

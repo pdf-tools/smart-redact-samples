@@ -20,6 +20,7 @@ CONTAINERS=(
   smart-redact-hitl-web
   smart-redact-manager-db
   smart-redact-orchestrator-db
+  smart-redact-rabbitmq
 )
 
 VOLUMES=(

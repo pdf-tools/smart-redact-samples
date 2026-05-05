@@ -513,6 +513,7 @@ cmd_docker_run_up() {
   require_docker
   run_script run-storage-init.sh
   run_script run-postgres.sh
+  run_script run-rabbitmq.sh
   if [ "$VARIANT" = "gpu" ]; then
     run_script run-worker-gpu.sh
   else
@@ -553,6 +554,7 @@ container_for_service() {
     hitl|hitl-web) echo smart-redact-hitl-web ;;
     manager-db) echo smart-redact-manager-db ;;
     orchestrator-db) echo smart-redact-orchestrator-db ;;
+    rabbitmq) echo smart-redact-rabbitmq ;;
     *) echo "$1" ;;
   esac
 }
@@ -574,6 +576,7 @@ cmd_docker_run_logs() {
       smart-redact-hitl-web
       smart-redact-manager-db
       smart-redact-orchestrator-db
+      smart-redact-rabbitmq
     )
   fi
 

@@ -23,6 +23,10 @@ docker run -d \
   --network "$NETWORK" \
   --restart unless-stopped \
   --gpus all \
+  -e "ServiceCommunication__ServiceCommunicationType=RabbitMQ" \
+  -e "ServiceCommunication__Host=smart-redact-rabbitmq" \
+  -e "ServiceCommunication__Username=guest" \
+  -e "ServiceCommunication__Password=guest" \
   -e "Licensing__LicenseKey=${PDFTOOLS_LICENSE_KEY}" \
   -e "Encryption__EncryptionKey=${ENCRYPTION_KEY}" \
   -e "Encryption__DekTokenTtlMinutes=1440" \
