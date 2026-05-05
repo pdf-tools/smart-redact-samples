@@ -38,32 +38,35 @@ For asynchronous jobs:
 The repository includes a sample PDF for testing. From the repository root:
 
 **curl (full workflow):**
+
 ```bash
-./api-examples/curl/full-workflow.sh "samples/Sample Document — AI Smart Redact.pdf"
+./api-examples/curl/full-workflow.sh "samples/Sample Document - AI Smart Redact.pdf"
 ```
 
 **Python (full workflow):**
+
 ```bash
-python3 api-examples/python/full_workflow.py "samples/Sample Document — AI Smart Redact.pdf"
+python3 api-examples/python/full_workflow.py "samples/Sample Document - AI Smart Redact.pdf"
 ```
 
 **C# (full workflow):**
+
 ```bash
-dotnet run --project api-examples/csharp -- "samples/Sample Document — AI Smart Redact.pdf"
+dotnet run --project api-examples/csharp -- "samples/Sample Document - AI Smart Redact.pdf"
 ```
 
 ## API endpoints
 
 **Manager API** (default: http://localhost:9982):
 
-| Method   | Endpoint                              | Description           |
-| -------- | ------------------------------------- | --------------------- |
-| `POST`   | `/v1/files/upload/fromLocal`          | Upload a PDF file     |
-| `POST`   | `/v1/files/upload/fromUrl`            | Upload a PDF from URL |
-| `GET`    | `/v1/files`                           | List uploaded files   |
-| `GET`    | `/v1/files/{fileId}`                  | Get file metadata     |
-| `POST`   | `/v1/files/download`                  | Download a file       |
-| `DELETE` | `/v1/files/{fileId}`                  | Delete a file         |
+| Method   | Endpoint                            | Description           |
+| -------- | ----------------------------------- | --------------------- |
+| `POST`   | `/v1/files/upload/fromLocal`        | Upload a PDF file     |
+| `POST`   | `/v1/files/upload/fromUrl`          | Upload a PDF from URL |
+| `GET`    | `/v1/files`                         | List uploaded files   |
+| `GET`    | `/v1/files/{fileId}`                | Get file metadata     |
+| `POST`   | `/v1/files/download`                | Download a file       |
+| `DELETE` | `/v1/files/{fileId}`                | Delete a file         |
 | `POST`   | `/v1/jobs/detection`                | Start a detection job |
 | `GET`    | `/v1/jobs/detection/{jobId}/result` | Get detection result  |
 | `POST`   | `/v1/jobs/redaction`                | Start a redaction job |
