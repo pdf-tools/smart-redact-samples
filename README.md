@@ -20,7 +20,7 @@ flowchart LR
     ManagerDB[("Manager DB<br/>PostgreSQL")]
 
     Browser -- HTTP --> HITL
-    Client -- HTTP --> Manager
+    Client -- HTTP --> Orchestrator
     HITL -- HTTP --> Orchestrator
     Orchestrator -- HTTP --> Manager
     Manager -- HTTP --> Worker
