@@ -2,7 +2,7 @@
 
 Usage examples for the AI Smart Redact Manager API.
 
-> For the full API reference, refer to [AI Smart Redact API Documentation](https://www.pdf-tools.com/docs/smart-redact/api-reference).
+> For the full API reference, refer to [AI Smart Redact API Documentation](https://www.pdf-tools.com/docs/smart-redact/references/api/).
 
 ## Available examples
 
@@ -81,4 +81,4 @@ If you're using the Orchestrator (web UI backend), it has its own API with authe
 - **Default credentials:** `admin@example.com` / `Admin@1234!Tmp` (password reset required on first login)
 - **Swagger UI:** http://localhost:9983/swagger
 
-> For details, refer to [Orchestrator Authentication Guide](https://www.pdf-tools.com/docs/smart-redact/authentication).
+> For details, refer to [Orchestrator Authentication Guide](https://www.pdf-tools.com/docs/smart-redact/guides/authentication/).
