@@ -24,13 +24,13 @@ This policy covers:
 - The sample configurations, scripts, and example code in this repository (`smart-redact-samples`).
 - The AI Smart Redact product itself (Manager, Worker, Orchestrator, and HITL Web UI), including the published Docker images under the `pdftoolsag/` namespace on Docker Hub.
 
-The same address (`security@pdftools.com`) handles reports for both. You don't need to determine whether an issue is in the samples or the product before reporting it — we'll route it internally.
+The same address (`security@pdftools.com`) handles reports for both the samples and the product. You don't need to work out which one an issue belongs to before reporting it. We route it internally.
 
 ## Response process
 
 After you submit a report, you can expect the following:
 
-1. **Acknowledgment** — within **5 business days**, confirming we received the report and have begun triage.
-2. **Initial assessment** — a follow-up with our preliminary severity assessment and any clarifying questions.
-3. **Remediation** — we'll keep you informed as we develop, test, and release a fix. Timelines depend on severity and complexity.
-4. **Disclosure** — we prefer coordinated disclosure: give us a reasonable window to release a fix before any public discussion.
+1. **Acknowledgment within 5 business days.** We confirm we received the report and have started triage.
+2. **Initial assessment.** We send our preliminary severity rating and any clarifying questions.
+3. **Remediation.** We keep you informed as we develop, test, and release a fix. Timelines depend on severity and complexity.
+4. **Disclosure.** We prefer coordinated disclosure. Give us a reasonable window to release a fix before you discuss the issue publicly.
