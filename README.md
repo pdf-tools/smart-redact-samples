@@ -40,15 +40,15 @@ flowchart LR
 ## Prerequisites
 
 - [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) v2+
-- A valid AI Smart Redact license key — register at [portal.pdf-tools.com](https://portal.pdf-tools.com/) to generate a free trial key, or see the [licensing docs](https://www.pdf-tools.com/docs/licenses/products/smart-redact-license/) for production keys.
+- A valid AI Smart Redact license key. Register at [portal.pdf-tools.com](https://portal.pdf-tools.com/) for a free trial key, or see the [licensing docs](https://www.pdf-tools.com/docs/licenses/products/smart-redact-license/) for production keys.
 - For GPU acceleration: NVIDIA GPU with [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html)
 
 ## Windows users
 
 The startup flow and API examples use bash. On Windows, use one of:
 
-- **WSL2** (recommended) — full Linux environment. Docker Desktop integrates with WSL2 natively, so `docker` commands just work.
-- **Git Bash** — bundled with [Git for Windows](https://git-scm.com/download/win). Sufficient for all Docker-based scripts in this repo, provided Docker Desktop is running and `python3` is available on `PATH` (needed by the curl API examples).
+- **WSL2** (recommended). Gives you a full Linux environment, and Docker Desktop integrates with it natively, so `docker` commands just work.
+- **Git Bash.** Ships with [Git for Windows](https://git-scm.com/download/win) and runs every Docker-based script in this repo, as long as Docker Desktop is running and `python3` is on your `PATH` (the curl API examples need it).
 
 The repository also includes a standalone PowerShell key-generation helper for manual key generation; `smart-redact.sh setup` generates keys automatically.
 
@@ -56,7 +56,7 @@ The repository also includes a standalone PowerShell key-generation helper for m
 
 The fastest way to get AI Smart Redact running:
 
-**Prerequisites:** A valid AI Smart Redact license key — register at [portal.pdf-tools.com](https://portal.pdf-tools.com/) to generate a free trial key, or see the [licensing docs](https://www.pdf-tools.com/docs/licenses/products/smart-redact-license/) for production keys.
+**Prerequisites:** A valid AI Smart Redact license key. Register at [portal.pdf-tools.com](https://portal.pdf-tools.com/) for a free trial key, or see the [licensing docs](https://www.pdf-tools.com/docs/licenses/products/smart-redact-license/) for production keys.
 
 ```bash
 # 1. Clone this repository
