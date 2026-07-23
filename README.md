@@ -82,10 +82,16 @@ Once running:
 - **Manager API (Swagger):** http://localhost:9982/swagger
 - **Orchestrator API (Swagger):** http://localhost:9983/swagger
 
-Default HITL / Orchestrator login:
+### Default login
 
-- **Email:** `admin@example.com`
-- **Password:** `Admin@1234!Tmp`
+Log in to the HITL Web UI (http://localhost:3000) or the Orchestrator Swagger UI (http://localhost:9983/swagger) with the built-in admin account:
+
+| Field        | Value              |
+| ------------ | ------------------ |
+| **Email**    | `admin@example.com`  |
+| **Password** | `Admin@1234!Tmp`     |
+
+> **First login resets the password.** The Orchestrator forces a password change the first time you sign in with this account, so the default password stops working after that. Pick your new password before you start, or note where you save it. These credentials are for local evaluation only. Change them for any shared or production deployment.
 
 ## Repository structure
 
