@@ -80,6 +80,17 @@ The CPU and GPU full-stack variants start the human-in-the-loop review UI at `ht
 
 When the stack is exposed through a remote host or reverse proxy, set `HITL_ORCHESTRATOR_URL` to the externally reachable Orchestrator URL. The HITL Web UI talks to the Manager only indirectly, through the Orchestrator.
 
+### Default login
+
+Sign in to the HITL Web UI (`http://localhost:3000`) or the Orchestrator Swagger UI (`http://localhost:9983/swagger`) with the built-in admin account:
+
+| Field | Value |
+|-------|-------|
+| Email | `admin@example.com` |
+| Password | `Admin@1234!Tmp` |
+
+The Orchestrator forces a password change on first login, so this default password stops working after you sign in once. These credentials are for local evaluation only. Change them for any shared or production deployment.
+
 ## Verifying the Deployment
 
 ```bash
