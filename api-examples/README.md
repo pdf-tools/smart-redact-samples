@@ -78,7 +78,7 @@ dotnet run --project api-examples/csharp -- "samples/Sample Document - AI Smart 
 
 If you're using the Orchestrator (web UI backend), it has its own API with authentication:
 
-- **Default credentials:** `admin@example.com` / `Admin@1234!Tmp` (password reset required on first login)
+- **Default credentials:** `admin@example.com` / `Admin@1234!Tmp` (the Orchestrator suggests changing the password after first login)
 - **Swagger UI:** http://localhost:9983/swagger
 
 > For details, refer to [Orchestrator Authentication Guide](https://www.pdf-tools.com/docs/smart-redact/guides/authentication/).

@@ -89,7 +89,7 @@ Sign in to the HITL Web UI (`http://localhost:3000`) or the Orchestrator Swagger
 | Email | `admin@example.com` |
 | Password | `Admin@1234!Tmp` |
 
-The Orchestrator forces a password change on first login, so this default password stops working after you sign in once. These credentials are for local evaluation only. Change them for any shared or production deployment.
+After you sign in, the Orchestrator shows a notification suggesting you change the password, but the default password keeps working until you do. These credentials are for local evaluation only. Change them for any shared or production deployment.
 
 ## Verifying the Deployment
 
