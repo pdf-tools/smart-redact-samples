@@ -1,3 +1,6 @@
+> [!WARNING]
+> **This repository is deprecated.** It runs Smart Redact 1.1.1 and is no longer maintained. Smart Redact now runs on Smart Suite: use the [Smart Suite samples](https://github.com/pdf-tools/smart-suite-samples) instead.
+
 # Pdftools AI Smart Redact samples
 
 Sample configurations and examples for deploying and using [AI Smart Redact](https://www.pdf-tools.com/docs/smart-redact) by Pdftools.
