@@ -4,7 +4,7 @@
 # =============================================================================
 set -euo pipefail
 
-VERSION="${VERSION:-latest}"
+VERSION="${VERSION:-1.1.1}"
 NETWORK="smart-redact-network"
 HITL_WEB_PORT="${HITL_WEB_PORT:-3000}"
 HITL_ORCHESTRATOR_URL="${HITL_ORCHESTRATOR_URL:-http://localhost:9983}"
