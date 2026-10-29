@@ -1,3 +1,6 @@
+> [!WARNING]
+> **This repository is deprecated.** It runs Smart Redact 1.1.1 and is no longer maintained. Smart Redact now runs on Smart Suite: use the [Smart Suite samples](https://github.com/pdf-tools/smart-suite-samples) instead.
+
 # Pdftools AI Smart Redact samples
 
 Sample configurations and examples for deploying and using [AI Smart Redact](https://www.pdf-tools.com/docs/smart-redact) by Pdftools.
@@ -144,7 +147,7 @@ Configure all AI Smart Redact services through environment variables:
 | `PDFTOOLS_LICENSE_KEY`    | Yes      | AI Smart Redact license key                                                                       |
 | `ENCRYPTION_KEY`          | Yes      | 32-byte Base64-encoded AES-256-GCM key                                                         |
 | `ORCHESTRATOR_JWT_SECRET` | Yes\*    | JWT signing secret (min 32 chars). \*Only for Orchestrator.                                    |
-| `VERSION`                 | No       | Docker image tag (default: `latest`)                                                           |
+| `VERSION`                 | No       | Docker image tag (default: `1.1.1`)                                                            |
 | `HITL_WEB_PORT`           | No       | Host port for the HITL Web UI (default: `3000`)                                                |
 | `HITL_ORCHESTRATOR_URL`   | No       | Browser-facing Orchestrator API URL used by the HITL Web UI (default: `http://localhost:9983`) |
 

@@ -297,7 +297,7 @@ write_env_file() {
     fi
     echo ''
     echo '# Optional settings'
-    echo '# VERSION=latest'
+    echo '# VERSION=1.1.1'
     if [ "$VARIANT" != "minimal" ]; then
       echo '# HITL_WEB_PORT=3000'
       echo '# HITL_ORCHESTRATOR_URL=http://localhost:9983'
@@ -598,7 +598,7 @@ cmd_docker_run_logs() {
 cmd_docker_run_pull() {
   load_env_file
   require_docker
-  local version="${VERSION:-latest}"
+  local version="${VERSION:-1.1.1}"
   docker pull postgres:15-alpine
   docker pull alpine:3
   docker pull rabbitmq:4-management-alpine

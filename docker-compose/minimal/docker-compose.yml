@@ -54,7 +54,7 @@ services:
   # Manager - Client-facing API for files and jobs
   # ---------------------------------------------------------------------------
   smart-redact-manager:
-    image: pdftoolsag/smart-redact-manager:${VERSION:-latest}
+    image: pdftoolsag/smart-redact-manager:${VERSION:-1.1.1}
     container_name: smart-redact-manager
     ports:
       - "9982:9982"
@@ -94,7 +94,7 @@ services:
   # Worker - PII detection and redaction engine (CPU)
   # ---------------------------------------------------------------------------
   smart-redact-worker:
-    image: pdftoolsag/smart-redact-worker:${VERSION:-latest}
+    image: pdftoolsag/smart-redact-worker:${VERSION:-1.1.1}
     container_name: smart-redact-worker
     expose:
       - "4885"

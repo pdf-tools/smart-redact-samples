@@ -7,7 +7,7 @@ set -euo pipefail
 : "${PDFTOOLS_LICENSE_KEY:?Error: PDFTOOLS_LICENSE_KEY is not set}"
 : "${ENCRYPTION_KEY:?Error: ENCRYPTION_KEY is not set}"
 
-VERSION="${VERSION:-latest}"
+VERSION="${VERSION:-1.1.1}"
 NETWORK="smart-redact-network"
 
 docker network inspect "$NETWORK" >/dev/null 2>&1 || \
